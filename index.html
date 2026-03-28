@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tong Wen — UI/UX Designer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --black: #000;
+            --white: #fff;
+            --dim: rgba(255,255,255,0.08);
+            --mid: rgba(255,255,255,0.4);
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--black);
+            color: var(--white);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* ─── CURSOR ─────────────────────────────────── */
+        #cur { position:fixed; width:8px; height:8px; background:#fff; border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:transform .15s, opacity .15s; }
+        #cur-ring { position:fixed; width:38px; height:38px; border:1px solid rgba(255,255,255,.35); border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); }
+        body:hover #cur { opacity:1; }
+
+        /* ─── NAV ─────────────────────────────────────── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+            padding: 32px 52px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { font-weight: 700; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; }
+        .nav-links { display: flex; gap: 36px; list-style: none; }
+        .nav-links a {
+            color: rgba(255,255,255,.45); text-decoration: none;
+            font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+            transition: color .3s;
+        }
+        .nav-links a:hover { color: #fff; }
+
+        /* ─── SECTIONS ────────────────────────────────── */
+        section {
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ─── HERO ────────────────────────────────────── */
+        #hero { display: flex; align-items: flex-end; padding: 0 52px 72px; }
+
+        #hero-canvas {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%; z-index: 0;
+        }
+
+        .hero-content { position: relative; z-index: 1; width: 100%; }
+
+        .hero-name {
+            display: block;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(96px, 15.5vw, 220px);
+            line-height: .88;
+            letter-spacing: -.5px;
+            user-select: none;
+        }
+
+        .hero-rule {
+            margin-top: 28px;
+            padding-top: 22px;
+            border-top: 1px solid rgba(255,255,255,.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .hero-sub { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; color: var(--mid); }
+        .hero-tagline { font-size: 13px; color: var(--mid); max-width: 280px; text-align: right; line-height: 1.7; }
+
+        /* Scroll indicator */
+        .scroll-hint {
+            position: absolute; right: 52px; bottom: 72px;
+            display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 1;
+        }
+        .scroll-hint span { font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,.25); writing-mode: vertical-rl; }
+        .scroll-track { width: 1px; height: 56px; background: rgba(255,255,255,.1); position: relative; overflow: hidden; }
+        .scroll-track::after {
+            content: ''; position: absolute; top: -100%; left: 0;
+            width: 100%; height: 100%; background: rgba(255,255,255,.6);
+            animation: trackRun 2s ease-in-out infinite;
+        }
+        @keyframes trackRun { to { top: 100%; } }
+
+        /* ─── PROJECT SECTIONS ────────────────────────── */
+        .proj {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-top: 1px solid rgba(255,255,255,.07);
+        }
+
+        .proj-info {
+            padding: 80px 52px;
+            display: flex; flex-direction: column; justify-content: center;
+            position: relative;
+        }
+
+        .proj-num {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(140px, 16vw, 220px);
+            color: rgba(255,255,255,.03);
+            position: absolute; top: 10px; left: 30px;
+            line-height: 1; pointer-events: none; user-select: none;
+        }
+
+        .proj-eyebrow {
+            font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+            color: rgba(255,255,255,.3); margin-bottom: 20px;
+            position: relative; z-index: 1;
+        }
+
+        .proj-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(52px, 5.5vw, 88px);
+            line-height: .95; color: #fff; margin-bottom: 24px;
+            position: relative; z-index: 1;
+        }
+
+        .proj-desc {
+            font-size: 14.5px; line-height: 1.85;
+            color: rgba(255,255,255,.45); max-width: 380px;
+            margin-bottom: 36px; position: relative; z-index: 1;
+        }
+
+        .proj-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 44px; position: relative; z-index: 1; }
+        .chip {
+            padding: 5px 14px;
+            border: 1px solid rgba(255,255,255,.15);
+            font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+            color: rgba(255,255,255,.4);
+        }
+
+        .proj-cta {
+            display: inline-flex; align-items: center; gap: 12px;
+            color: #fff; text-decoration: none;
+            font-size: 11px; letter-spacing: 3px; text-transform: uppercase; font-weight: 600;
+            position: relative; z-index: 1; width: fit-content;
+            transition: gap .3s ease;
+        }
+        .proj-cta:hover { gap: 22px; }
+        .proj-cta .cta-arrow { font-size: 17px; transition: transform .3s; }
+        .proj-cta:hover .cta-arrow { transform: translateX(4px); }
+        .proj-cta-line {
+            position: absolute; bottom: -5px; left: 0; right: 0;
+            height: 1px; background: #fff;
+            transform: scaleX(0); transform-origin: left; transition: transform .3s;
+        }
+        .proj-cta:hover .proj-cta-line { transform: scaleX(1); }
+
+        /* ─── VISUAL PANE ─────────────────────────────── */
+        .proj-visual {
+            display: flex; align-items: center; justify-content: center;
+            background: #050505;
+            perspective: 1400px;
+        }
+
+        /* ── PHONE ──────────────────────────────────── */
+        .phone {
+            width: 230px; height: 460px;
+            transform: rotateY(-18deg) rotateX(7deg);
+            transform-style: preserve-3d;
+            transition: transform .4s cubic-bezier(.25,.8,.25,1);
+        }
+        .phone-shell {
+            width: 100%; height: 100%;
+            background: #0f0f0f;
+            border-radius: 38px;
+            border: 1.5px solid rgba(255,255,255,.14);
+            position: relative; overflow: hidden;
+            box-shadow: 22px 22px 60px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.07);
+        }
+        .phone-screen {
+            position: absolute;
+            top: 10%; left: 4%; right: 4%; bottom: 7%;
+            background: #0a0a0a;
+            border-radius: 28px; overflow: hidden;
+        }
+        .p-ui { padding: 16px 14px; height: 100%; display: flex; flex-direction: column; }
+        .p-status { display: flex; justify-content: space-between; font-size: 7px; color: rgba(255,255,255,.45); letter-spacing: 1px; margin-bottom: 18px; }
+        .p-greeting { font-size: 10px; color: rgba(255,255,255,.35); }
+        .p-name { font-size: 19px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        .p-label { font-size: 8px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.25); margin-bottom: 20px; }
+        .p-card {
+            background: rgba(255,255,255,.045); border-radius: 12px;
+            padding: 12px 12px; margin-bottom: 8px;
+        }
+        .p-card-label { font-size: 7px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.3); margin-bottom: 6px; }
+        .p-card-val { font-size: 17px; font-weight: 700; color: #fff; }
+        .p-bars { display: flex; gap: 4px; margin-top: 10px; align-items: flex-end; }
+        .p-bar { border-radius: 3px; background: rgba(255,255,255,.1); flex: 1; }
+        .p-bar.hi { background: rgba(255,255,255,.45); }
+        .p-nav { margin-top: auto; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid rgba(255,255,255,.06); }
+        .p-nav-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.2); }
+        .p-nav-dot.on { background: #fff; width: 18px; border-radius: 3px; }
+
+        /* ── LAPTOP ─────────────────────────────────── */
+        .laptop {
+            width: 460px; height: 300px;
+            transform: rotateY(14deg) rotateX(-6deg);
+            transform-style: preserve-3d;
+            transition: transform .4s cubic-bezier(.25,.8,.25,1);
+        }
+        .laptop-lid {
+            width: 100%; height: 82%;
+            background: #0f0f0f;
+            border-radius: 12px 12px 0 0;
+            border: 1.5px solid rgba(255,255,255,.12); border-bottom: none;
+            overflow: hidden;
+            box-shadow: 0 -16px 40px rgba(0,0,0,.8);
+        }
+        .laptop-scrn {
+            position: absolute; top: 5%; left: 3.5%; right: 3.5%; bottom: 0;
+            background: #080808;
+        }
+        .l-ui { display: grid; grid-template-columns: 52px 1fr; height: 100%; }
+        .l-side { background: rgba(255,255,255,.025); padding: 14px 8px; display: flex; flex-direction: column; gap: 8px; }
+        .l-av { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,.08); margin-bottom: 10px; }
+        .l-s { height: 3px; border-radius: 2px; background: rgba(255,255,255,.08); }
+        .l-s.on { background: rgba(255,255,255,.5); width: 70%; }
+        .l-main { padding: 12px; }
+        .l-topbar { display: flex; gap: 5px; margin-bottom: 12px; }
+        .l-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.18); }
+        .l-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .l-card { background: rgba(255,255,255,.035); border-radius: 6px; padding: 8px; border: 1px solid rgba(255,255,255,.05); }
+        .l-cline { height: 3px; border-radius: 2px; background: rgba(255,255,255,.1); margin-bottom: 5px; }
+        .l-chart { height: 28px; background: rgba(255,255,255,.02); border-radius: 4px; position: relative; overflow: hidden; }
+        .l-wave { position: absolute; inset: 0; background: linear-gradient(to top, rgba(255,255,255,.08), transparent); clip-path: polygon(0 100%,0 55%,18% 35%,38% 48%,58% 18%,78% 32%,100% 8%,100% 100%); }
+        .l-wide { grid-column: span 2; }
+        .l-row { display: flex; gap: 4px; margin-top: 6px; }
+        .l-seg { height: 18px; border-radius: 3px; background: rgba(255,255,255,.06); }
+        .laptop-base {
+            width: 106%; margin-left: -3%;
+            height: 18px; background: #141414;
+            border-radius: 0 0 8px 8px;
+            border: 1.5px solid rgba(255,255,255,.1); border-top: none;
+            box-shadow: 0 12px 32px rgba(0,0,0,.9);
+        }
+
+        /* ── TABLET ─────────────────────────────────── */
+        .tablet {
+            width: 320px; height: 420px;
+            transform: rotateY(-14deg) rotateX(7deg);
+            transform-style: preserve-3d;
+            transition: transform .4s cubic-bezier(.25,.8,.25,1);
+        }
+        .tablet-shell {
+            width: 100%; height: 100%;
+            background: #0f0f0f;
+            border-radius: 22px;
+            border: 1.5px solid rgba(255,255,255,.13);
+            overflow: hidden;
+            box-shadow: 26px 26px 60px rgba(0,0,0,.9);
+        }
+        .tablet-scrn {
+            position: absolute; top: 3.5%; left: 2.5%; right: 2.5%; bottom: 3.5%;
+            background: #090909; border-radius: 16px; overflow: hidden;
+        }
+        .t-ui { padding: 14px; height: 100%; }
+        .t-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .t-title { font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,.6); }
+        .t-pill { height: 10px; width: 50px; border-radius: 5px; background: rgba(255,255,255,.06); }
+        .t-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; }
+        .t-block {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,.04);
+            border-radius: 8px; padding: 10px 8px;
+            border: 1px solid rgba(255,255,255,.06);
+            display: flex; flex-direction: column; gap: 5px; align-items: center; justify-content: center;
+        }
+        .t-block.sel { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.18); }
+        .t-ico { width: 20px; height: 20px; border-radius: 5px; background: rgba(255,255,255,.1); }
+        .t-lbl { height: 3px; width: 65%; border-radius: 2px; background: rgba(255,255,255,.1); }
+
+        /* ─── SCROLL REVEAL ───────────────────────────── */
+        .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+        .reveal.show { opacity: 1; transform: none; }
+        .reveal:nth-child(2) { transition-delay: .1s; }
+        .reveal:nth-child(3) { transition-delay: .2s; }
+        .reveal:nth-child(4) { transition-delay: .3s; }
+        .reveal:nth-child(5) { transition-delay: .4s; }
+
+        /* ─── CONTACT ─────────────────────────────────── */
+        #contact {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-top: 1px solid rgba(255,255,255,.07);
+            position: relative;
+        }
+        .contact-pre { font-size: 10px; letter-spacing: 5px; text-transform: uppercase; color: rgba(255,255,255,.25); margin-bottom: 36px; }
+        .contact-email {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(32px, 5.5vw, 90px);
+            color: #fff; text-decoration: none;
+            text-align: center; line-height: 1.1;
+            transition: color .4s;
+        }
+        .contact-email:hover { color: rgba(255,255,255,.3); }
+        .contact-socials { display: flex; gap: 44px; margin-top: 56px; }
+        .contact-socials a {
+            font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+            color: rgba(255,255,255,.25); text-decoration: none; transition: color .3s;
+        }
+        .contact-socials a:hover { color: #fff; }
+        .contact-footer {
+            position: absolute; bottom: 36px; left: 52px; right: 52px;
+            display: flex; justify-content: space-between;
+        }
+        .contact-footer span { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,.15); }
+
+        /* ─── NOISE OVERLAY ───────────────────────────── */
+        .noise-overlay {
+            position: fixed; inset: 0; z-index: 1000; pointer-events: none;
+            opacity: .025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 120px 120px;
+        }
+
+        /* ─── RESPONSIVE ──────────────────────────────── */
+        @media (max-width: 900px) {
+            .proj { grid-template-columns: 1fr; }
+            .proj-visual { height: 50vh; order: -1; }
+            .proj:nth-child(even) .proj-info { order: unset; }
+            .proj:nth-child(even) .proj-visual { order: unset; }
+            .laptop { width: 320px; height: 210px; }
+            .phone { width: 170px; height: 340px; }
+            .tablet { width: 230px; height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="noise-overlay"></div>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<!-- NAV -->
+<nav>
+    <div class="logo">TW</div>
+    <ul class="nav-links">
+        <li><a href="#work">Work</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+</nav>
+
+
+<!-- ══════════════ HERO ══════════════ -->
+<section id="hero">
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-content">
+        <span class="hero-name">TONG</span>
+        <span class="hero-name">WEN</span>
+        <div class="hero-rule">
+            <span class="hero-sub">UI/UX Designer &nbsp;—&nbsp; Open for Projects</span>
+            <span class="hero-tagline">Designing bold digital experiences — interfaces that feel inevitable.</span>
+        </div>
+    </div>
+    <div class="scroll-hint">
+        <div class="scroll-track"></div>
+        <span>Scroll</span>
+    </div>
+</section>
+
+
+<!-- ══════════════ PROJECT 01 ══════════════ -->
+<section class="proj" id="work">
+    <!-- Info -->
+    <div class="proj-info">
+        <div class="proj-num">01</div>
+        <p class="proj-eyebrow reveal">UI / UX Design &nbsp;·&nbsp; 2024</p>
+        <h2 class="proj-title reveal">FINOVA<br>BANKING APP</h2>
+        <p class="proj-desc reveal">A next-gen personal finance app built for calm and clarity. Every screen strips noise to surface what matters — your money, understood at a glance.</p>
+        <div class="proj-chips reveal">
+            <span class="chip">iOS Design</span>
+            <span class="chip">Prototyping</span>
+            <span class="chip">User Research</span>
+            <span class="chip">Figma</span>
+        </div>
+        <a href="#" class="proj-cta reveal">
+            View Case Study
+            <span class="cta-arrow">→</span>
+            <span class="proj-cta-line"></span>
+        </a>
+    </div>
+
+    <!-- 3D Phone Mockup -->
+    <div class="proj-visual" id="v1">
+        <div class="phone" id="m1">
+            <div class="phone-shell">
+                <div class="phone-screen">
+                    <div class="p-ui">
+                        <div class="p-status">
+                            <span>9:41</span>
+                            <span>●●●</span>
+                        </div>
+                        <div class="p-greeting">Good morning,</div>
+                        <div class="p-name">Tong.</div>
+                        <div class="p-label">Your Finances</div>
+                        <div class="p-card">
+                            <div class="p-card-label">Total Balance</div>
+                            <div class="p-card-val">$24,850</div>
+                            <div class="p-bars">
+                                <div class="p-bar hi" style="height:32px"></div>
+                                <div class="p-bar" style="height:18px"></div>
+                                <div class="p-bar hi" style="height:26px;opacity:.5"></div>
+                                <div class="p-bar" style="height:14px"></div>
+                                <div class="p-bar hi" style="height:38px"></div>
+                                <div class="p-bar" style="height:22px"></div>
+                                <div class="p-bar hi" style="height:30px;opacity:.7"></div>
+                            </div>
+                        </div>
+                        <div class="p-card" style="background:rgba(255,255,255,.02)">
+                            <div class="p-card-label">Monthly Spend</div>
+                            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px">↑ 12% from last month</div>
+                        </div>
+                        <div class="p-nav">
+                            <div class="p-nav-dot"></div>
+                            <div class="p-nav-dot on"></div>
+                            <div class="p-nav-dot"></div>
+                            <div class="p-nav-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════ PROJECT 02 ══════════════ -->
+<section class="proj">
+    <!-- 3D Laptop Mockup (left) -->
+    <div class="proj-visual" id="v2" style="order:-1">
+        <div style="display:flex;flex-direction:column;align-items:center">
+            <div class="laptop" id="m2" style="position:relative">
+                <div class="laptop-lid" style="position:relative">
+                    <div class="laptop-scrn">
+                        <div class="l-ui">
+                            <div class="l-side">
+                                <div class="l-av"></div>
+                                <div class="l-s on"></div>
+                                <div class="l-s"></div>
+                                <div class="l-s"></div>
+                                <div class="l-s" style="margin-top:auto"></div>
+                                <div class="l-s"></div>
+                            </div>
+                            <div class="l-main">
+                                <div class="l-topbar">
+                                    <div class="l-dot"></div>
+                                    <div class="l-dot"></div>
+                                    <div class="l-dot"></div>
+                                </div>
+                                <div class="l-grid">
+                                    <div class="l-card">
+                                        <div class="l-cline"></div>
+                                        <div class="l-cline" style="width:40%;opacity:.5"></div>
+                                        <div class="l-chart"><div class="l-wave"></div></div>
+                                    </div>
+                                    <div class="l-card">
+                                        <div class="l-cline" style="width:55%"></div>
+                                        <div class="l-cline" style="width:35%;opacity:.5"></div>
+                                        <div class="l-chart" style="clip-path:polygon(0 100%,0 70%,25% 50%,50% 60%,75% 30%,100% 40%,100% 100%)"><div class="l-wave"></div></div>
+                                    </div>
+                                    <div class="l-card l-wide">
+                                        <div class="l-cline" style="width:25%"></div>
+                                        <div class="l-row">
+                                            <div class="l-seg" style="flex:2;background:rgba(255,255,255,.04)"></div>
+                                            <div class="l-seg" style="flex:3;background:rgba(255,255,255,.11)"></div>
+                                            <div class="l-seg" style="flex:1;background:rgba(255,255,255,.04)"></div>
+                                            <div class="l-seg" style="flex:2;background:rgba(255,255,255,.07)"></div>
+                                            <div class="l-seg" style="flex:4;background:rgba(255,255,255,.13)"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="laptop-base"></div>
+        </div>
+    </div>
+
+    <!-- Info -->
+    <div class="proj-info">
+        <div class="proj-num">02</div>
+        <p class="proj-eyebrow reveal">Web Design &nbsp;·&nbsp; 2024</p>
+        <h2 class="proj-title reveal">AURA<br>WELLNESS DASH</h2>
+        <p class="proj-desc reveal">A holistic health dashboard turning complex biometric data into calm, beautiful visuals. Clarity at a glance — depth on demand. Designed for people who take their wellbeing seriously.</p>
+        <div class="proj-chips reveal">
+            <span class="chip">Dashboard</span>
+            <span class="chip">Data Viz</span>
+            <span class="chip">Web App</span>
+            <span class="chip">Design System</span>
+        </div>
+        <a href="#" class="proj-cta reveal">
+            View Case Study
+            <span class="cta-arrow">→</span>
+            <span class="proj-cta-line"></span>
+        </a>
+    </div>
+</section>
+
+
+<!-- ══════════════ PROJECT 03 ══════════════ -->
+<section class="proj">
+    <!-- Info -->
+    <div class="proj-info">
+        <div class="proj-num">03</div>
+        <p class="proj-eyebrow reveal">Design System &nbsp;·&nbsp; 2023</p>
+        <h2 class="proj-title reveal">VOID<br>DESIGN SYSTEM</h2>
+        <p class="proj-desc reveal">A comprehensive dark-mode-first design system for scale. 200+ components, full token architecture, and Figma-to-code documentation — built to unify a fast-growing SaaS product.</p>
+        <div class="proj-chips reveal">
+            <span class="chip">Design System</span>
+            <span class="chip">Figma</span>
+            <span class="chip">200+ Components</span>
+        </div>
+        <a href="#" class="proj-cta reveal">
+            View Case Study
+            <span class="cta-arrow">→</span>
+            <span class="proj-cta-line"></span>
+        </a>
+    </div>
+
+    <!-- 3D Tablet Mockup -->
+    <div class="proj-visual" id="v3">
+        <div class="tablet" id="m3">
+            <div class="tablet-shell">
+                <div class="tablet-scrn">
+                    <div class="t-ui">
+                        <div class="t-header">
+                            <div class="t-title">Components</div>
+                            <div class="t-pill"></div>
+                        </div>
+                        <div class="t-grid">
+                            <div class="t-block"><div class="t-ico"></div><div class="t-lbl"></div></div>
+                            <div class="t-block sel"><div class="t-ico" style="background:rgba(255,255,255,.3)"></div><div class="t-lbl" style="background:rgba(255,255,255,.3)"></div></div>
+                            <div class="t-block"><div class="t-ico" style="border-radius:50%"></div><div class="t-lbl"></div></div>
+                            <div class="t-block"><div class="t-ico" style="border-radius:2px"></div><div class="t-lbl"></div></div>
+                            <div class="t-block"><div class="t-ico"></div><div class="t-lbl"></div></div>
+                            <div class="t-block"><div class="t-ico" style="border-radius:10px"></div><div class="t-lbl"></div></div>
+                            <div class="t-block"><div class="t-ico"></div><div class="t-lbl"></div></div>
+                            <div class="t-block"><div class="t-ico" style="border-radius:50%"></div><div class="t-lbl"></div></div>
+                            <div class="t-block"><div class="t-ico" style="border-radius:3px"></div><div class="t-lbl"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════ CONTACT ══════════════ -->
+<section id="contact">
+    <p class="contact-pre">Let's work together</p>
+    <a class="contact-email" href="mailto:tongwendesigner@gmail.com">
+        TONGWENDESIGNER<br>@GMAIL.COM
+    </a>
+    <div class="contact-socials">
+        <a href="#">LinkedIn</a>
+        <a href="#">Dribbble</a>
+        <a href="#">Behance</a>
+    </div>
+    <div class="contact-footer">
+        <span>© 2026 Tong Wen</span>
+        <span>Designed &amp; Built by TW</span>
+    </div>
+</section>
+
+
+<!-- ══════════════ SCRIPTS ══════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ── CURSOR ─────────────────────────────────────── */
+const cur = document.getElementById('cur');
+const ring = document.getElementById('cur-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+});
+
+(function tickCursor() {
+    rx += (mx - rx) * .13;
+    ry += (my - ry) * .13;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(tickCursor);
+})();
+
+document.querySelectorAll('a, .proj-cta').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+        cur.style.transform = 'translate(-50%,-50%) scale(2.5)';
+        cur.style.opacity = '.25';
+        ring.style.transform = 'translate(-50%,-50%) scale(1.6)';
+    });
+    el.addEventListener('mouseleave', () => {
+        cur.style.transform = 'translate(-50%,-50%) scale(1)';
+        cur.style.opacity = '1';
+        ring.style.transform = 'translate(-50%,-50%) scale(1)';
+    });
+});
+
+
+/* ── THREE.JS HERO ──────────────────────────────── */
+const canvas = document.getElementById('hero-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 100);
+camera.position.z = 6;
+
+const geos = [
+    new THREE.IcosahedronGeometry(.9, 0),
+    new THREE.OctahedronGeometry(.75, 0),
+    new THREE.TetrahedronGeometry(.7, 0),
+    new THREE.BoxGeometry(1.1, 1.1, 1.1),
+    new THREE.IcosahedronGeometry(.45, 0),
+    new THREE.OctahedronGeometry(.55, 0),
+    new THREE.BoxGeometry(.65, .65, .65),
+    new THREE.IcosahedronGeometry(.35, 0),
+    new THREE.TetrahedronGeometry(.5, 0),
+    new THREE.OctahedronGeometry(.3, 0),
+];
+
+const meshes = geos.map((geo, i) => {
+    const mat = new THREE.MeshBasicMaterial({
+        color: 0xffffff, wireframe: true,
+        opacity: .08 + Math.random() * .09, transparent: true
+    });
+    const m = new THREE.Mesh(geo, mat);
+    m.position.set(
+        (Math.random() - .5) * 18,
+        (Math.random() - .5) * 11,
+        (Math.random() - .5) * 9
+    );
+    m.rotation.set(Math.random() * 6.28, Math.random() * 6.28, Math.random() * 6.28);
+    m.userData = {
+        rx: (Math.random() - .5) * .004,
+        ry: (Math.random() - .5) * .006,
+        fs: Math.random() * .0006 + .0002,
+        fo: Math.random() * 6.28
+    };
+    scene.add(m);
+    return m;
+});
+
+let camTX = 0, camTY = 0;
+document.addEventListener('mousemove', e => {
+    camTX = (e.clientX / innerWidth - .5) * .8;
+    camTY = -(e.clientY / innerHeight - .5) * .5;
+});
+
+let t = 0;
+(function tick() {
+    requestAnimationFrame(tick);
+    t += .008;
+    meshes.forEach(m => {
+        m.rotation.x += m.userData.rx;
+        m.rotation.y += m.userData.ry;
+        m.position.y += Math.sin(t + m.userData.fo) * m.userData.fs;
+    });
+    camera.position.x += (camTX - camera.position.x) * .04;
+    camera.position.y += (camTY - camera.position.y) * .04;
+    camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
+})();
+
+window.addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+});
+
+
+/* ── 3D TILT EFFECT ─────────────────────────────── */
+function tilt(visualEl, mockupEl, baseY, baseX) {
+    if (!visualEl || !mockupEl) return;
+    visualEl.addEventListener('mousemove', e => {
+        const r = visualEl.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - .5;
+        const y = (e.clientY - r.top) / r.height - .5;
+        mockupEl.style.transform = `rotateY(${baseY + x * 22}deg) rotateX(${baseX - y * 16}deg) scale(1.03)`;
+    });
+    visualEl.addEventListener('mouseleave', () => {
+        mockupEl.style.transform = `rotateY(${baseY}deg) rotateX(${baseX}deg) scale(1)`;
+    });
+}
+
+tilt(document.getElementById('v1'), document.getElementById('m1'), -18, 7);
+tilt(document.getElementById('v2'), document.getElementById('m2'),  14, -6);
+tilt(document.getElementById('v3'), document.getElementById('m3'), -14, 7);
+
+
+/* ── SCROLL REVEAL ──────────────────────────────── */
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            // stagger siblings within same parent
+            const siblings = [...entry.target.parentElement.querySelectorAll('.reveal')];
+            const idx = siblings.indexOf(entry.target);
+            setTimeout(() => entry.target.classList.add('show'), idx * 90);
+            io.unobserve(entry.target);
+        }
+    });
+}, { threshold: .12 });
+revealEls.forEach(el => io.observe(el));
+</script>
+</body>
+</html>

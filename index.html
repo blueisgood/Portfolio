@@ -76,8 +76,15 @@
             font-weight:900; font-size:15px; letter-spacing:.18em;
             cursor: none;
         }
-        .nav-logo:hover .lc { border-color: rgba(255,255,255,1); transition: border-color .2s; }
-        .nav-logo:hover .logo-mark span:last-child { opacity: .7; transition: opacity .2s; }
+        /* bracket hover — expand outward */
+        .nav-logo:hover .lc.tl { top:-4px; left:-4px; border-color:rgba(255,255,255,1); }
+        .nav-logo:hover .lc.tr { top:-4px; right:-4px; border-color:rgba(255,255,255,1); }
+        .nav-logo:hover .lc.bl { bottom:-4px; left:-4px; border-color:rgba(255,255,255,1); }
+        .nav-logo:hover .lc.br { bottom:-4px; right:-4px; border-color:rgba(255,255,255,1); }
+        /* glitch on hover */
+        .nav-logo:hover .logo-text { animation:glitch-base .45s steps(2) infinite; }
+        .nav-logo:hover .logo-text::before { animation:glitch-top .45s steps(2) infinite; }
+        .nav-logo:hover .logo-text::after  { animation:glitch-bot .45s steps(2) infinite; }
         .nav-center {
             position:absolute; left:50%; transform:translateX(-50%);
             display:flex; align-items:center; gap:6px;
@@ -439,7 +446,14 @@
             font-weight:900; letter-spacing:.16em;
             color:#fff; text-transform:uppercase;
         }
-        .logo-mark .lc { position:absolute; }
+        .logo-mark .lc {
+            position:absolute;
+            transition: top .25s cubic-bezier(.34,1.56,.64,1),
+                        left .25s cubic-bezier(.34,1.56,.64,1),
+                        right .25s cubic-bezier(.34,1.56,.64,1),
+                        bottom .25s cubic-bezier(.34,1.56,.64,1),
+                        border-color .2s;
+        }
         /* nav size */
         .logo-mark.sm  { font-size:11px; padding:7px 13px; }
         .logo-mark.sm .lc { width:7px; height:7px; }
@@ -458,6 +472,46 @@
         .lc.br { bottom:0; right:0;
             border-bottom:1.5px solid rgba(255,255,255,.65);
             border-right:1.5px solid rgba(255,255,255,.65); }
+
+        /* ── GLITCH TEXT ─────────────────────────────── */
+        .logo-text {
+            position:relative;
+            display:inline-block;
+        }
+        .logo-text::before,
+        .logo-text::after {
+            content: attr(data-text);
+            position:absolute;
+            left:0; top:0;
+            width:100%;
+            pointer-events:none;
+            opacity:0;
+        }
+        .nav-logo:hover .logo-text::before {
+            opacity:1;
+            color:#0ff;
+            clip-path:polygon(0 15%, 100% 15%, 100% 42%, 0 42%);
+            transform:translate(-2px);
+        }
+        .nav-logo:hover .logo-text::after {
+            opacity:1;
+            color:#f0f;
+            clip-path:polygon(0 58%, 100% 58%, 100% 85%, 0 85%);
+            transform:translate(2px);
+        }
+        @keyframes glitch-base {
+            0%,100% { transform:translate(0); }
+            33%      { transform:translate(-1px, 1px); }
+            66%      { transform:translate(1px, -1px); }
+        }
+        @keyframes glitch-top {
+            0%,100% { clip-path:polygon(0 15%,100% 15%,100% 42%,0 42%); transform:translate(-2px); }
+            50%      { clip-path:polygon(0 48%,100% 48%,100% 58%,0 58%); transform:translate(2px); }
+        }
+        @keyframes glitch-bot {
+            0%,100% { clip-path:polygon(0 58%,100% 58%,100% 85%,0 85%); transform:translate(2px); }
+            50%      { clip-path:polygon(0 25%,100% 25%,100% 42%,0 42%); transform:translate(-2px); }
+        }
 
         /* ── INTRO OVERLAY ───────────────────────────── */
         #intro {
@@ -606,7 +660,7 @@
                 <span class="lc tr"></span>
                 <span class="lc bl"></span>
                 <span class="lc br"></span>
-                <span>Tong Wen</span>
+                <span class="logo-text" data-text="Tong Wen">Tong Wen</span>
             </div>
         </div>
 
@@ -656,7 +710,7 @@
                 <span class="lc tr"></span>
                 <span class="lc bl"></span>
                 <span class="lc br"></span>
-                <span>Tong Wen</span>
+                <span class="logo-text" data-text="Tong Wen">Tong Wen</span>
             </div>
         </div>
         <div class="nav-center">

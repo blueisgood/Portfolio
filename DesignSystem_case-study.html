@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A design system that can&rsquo;t drift — Case Study</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+  :root{
+    --indigo:#190337; --indigo-deep:#120226; --indigo-soft:#260552; --indigo-pale:#ece7f5;
+    --gold:#b5985a; --gold-deep:#79653c;
+    --accent:#2b1466; --accent-deep:#221056; --accent-tint:#ece7f5; --accent-bright:#a99bf2;
+    --paper:#fdfdfd; --mist:#eeeff2;
+    --ink:#1b1b1b; --muted:#5b5b5d; --faint:#8d8f95; --line:#a6a7ae;
+    --red:#a82e24; --red-tint:#f5e8e7; --green:#1f7a1f;
+    --sans:'Open Sans',-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+    --display:'Space Grotesk','Open Sans',sans-serif;
+    --hair:rgba(27,27,27,.10);
+  }
+  .dark{--accent:#a99bf2;--accent-deep:#a99bf2}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--indigo-deep);
+    background-image:radial-gradient(circle at 16% 10%, rgba(181,152,90,.10), transparent 42%),radial-gradient(circle at 90% 92%, rgba(38,5,82,.7), transparent 50%);
+    color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
+  .prog{position:fixed;top:0;left:0;height:3px;background:var(--accent-bright);width:0;z-index:20;transition:width .4s cubic-bezier(.2,.7,.2,1)}
+  .deck{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:32px}
+  .slide{display:none;width:100%;max-width:1060px;height:min(656px,87vh);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.45);position:relative}
+  .slide.on{display:block;animation:rise .45s cubic-bezier(.2,.7,.2,1)}
+  @keyframes rise{from{opacity:0;transform:translateY(10px) scale(.995)}to{opacity:1;transform:none}}
+  .pad{position:absolute;inset:0;padding:50px 58px;display:flex;flex-direction:column;overflow:auto}
+  .light{background:var(--paper)}
+  .dark{background:var(--indigo);color:var(--paper)}
+  .dark::before{content:'';position:absolute;inset:0;opacity:.5;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:34px 34px;mask-image:radial-gradient(circle at 72% 60%, #000, transparent 76%)}
+
+  .kick{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent);margin:0 0 16px;display:flex;align-items:center;gap:14px}
+  .kick::after{content:"";flex:1 1 auto;height:1px;background:currentColor;opacity:.32}
+  h1{font-family:var(--display);font-size:53px;font-weight:700;letter-spacing:-1.4px;line-height:1.03;margin:0}
+  h2{font-family:var(--display);font-size:36px;font-weight:700;letter-spacing:-.7px;line-height:1.1;margin:0 0 8px}
+  .sub{font-size:15.5px;color:var(--muted);line-height:1.55;max-width:700px;margin:13px 0 0}
+  .dark .sub{color:#c9c2dc}
+  .body{margin-top:auto;margin-bottom:auto;flex:1;display:flex;flex-direction:column;justify-content:center}
+  .mono{font-family:var(--mono)}
+  .role{font-family:var(--mono);font-size:12.5px;color:#c9c2dc;margin-top:24px;letter-spacing:.3px;line-height:1.6}
+  .role b{color:var(--accent)}
+
+  ul.pts{list-style:none;padding:0;margin:0}
+  ul.pts li{font-size:15.5px;line-height:1.5;padding:13px 0 13px 28px;position:relative;border-top:1px solid var(--hair)}
+  ul.pts li:first-child{border-top:none}
+  ul.pts li::before{content:'';position:absolute;left:0;top:18px;width:9px;height:9px;background:var(--accent);transform:rotate(45deg)}
+  ul.pts li b{font-weight:700} ul.pts li .s{color:var(--muted)}
+
+  .statement{font-size:28px;font-weight:700;line-height:1.34;letter-spacing:-.4px;max-width:850px}
+  .statement .g{color:var(--accent)} .statement .q{color:var(--faint)}
+
+  .stat-row{display:flex;gap:38px;flex-wrap:wrap}
+  .stat .n{font-size:36px;font-weight:800;letter-spacing:-1px;color:var(--indigo)}
+  .stat .k{font-size:12.5px;color:var(--muted);margin-top:4px;max-width:190px}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:stretch}
+  .opt{background:var(--mist);border:1px solid var(--hair);border-radius:14px;padding:19px 21px}
+  .opt .h{font-size:15.5px;font-weight:700;margin:0 0 7px}
+  .opt .p{font-size:13px;color:var(--muted);line-height:1.5;margin:0}
+  .opt .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.5px;color:var(--faint);text-transform:uppercase;display:block;margin-bottom:7px}
+  .opt.hot{border-color:var(--accent);background:var(--accent-tint)}
+  .verdict{font-size:16px;font-weight:600;margin-top:18px;line-height:1.5} .verdict .g{color:var(--accent-deep)}
+  .chips{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+  .chip{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--mist);border:1px solid var(--hair);border-radius:999px;padding:6px 12px}
+  .chip b{color:var(--ink)}
+
+  .three{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:stretch;margin-top:4px}
+  .layer{background:var(--paper);border:1.5px solid var(--hair);border-radius:14px;padding:19px;position:relative}
+  .layer+.layer{margin-left:36px}
+  .layer .ln{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--accent);letter-spacing:1px}
+  .layer h4{font-size:15.5px;margin:7px 0 6px} .layer p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.5}
+  .layer .file{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:10px}
+  .layer .ar{position:absolute;right:-28px;top:50%;transform:translateY(-50%);color:var(--accent);font-size:20px}
+
+  .ladder{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+  .rung{display:flex;align-items:center;gap:16px;background:var(--mist);border:1px solid var(--hair);border-radius:12px;padding:12px 18px}
+  .rung .lv{font-family:var(--mono);font-size:10.5px;color:var(--accent);width:104px;flex:none;letter-spacing:.5px}
+  .rung b{font-size:15px} .rung span{font-size:13px;color:var(--muted)}
+  .rung.beyond{border-color:var(--accent);background:var(--accent-tint)}
+  .stopline{font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.5px;text-align:center;padding:2px 0}
+
+  .card{background:var(--mist);border:1px solid var(--hair);border-radius:14px;padding:19px}
+  .card .ct{font-family:var(--mono);font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--faint);margin:0 0 12px}
+  .specs{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .spec{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .spec .l{font-family:var(--mono);font-size:10px;color:var(--faint)}
+  .sw{width:26px;height:26px;border-radius:6px;border:.5px solid var(--hair)}
+  .brandnote{margin-top:16px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:12px;line-height:1.45}
+  .brandnote .dots3{display:flex;gap:5px;flex:none}.brandnote .dots3 i{width:16px;height:16px;border-radius:5px;display:block}
+
+  .gov{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:start}
+  .govlist{display:flex;flex-direction:column}
+  .gr{padding:11px 0;border-top:1px solid rgba(255,255,255,.12)} .gr:first-child{border-top:none}
+  .gr b{font-size:14.5px} .gr span{display:block;font-size:12.5px;color:#c9c2dc;margin-top:2px;line-height:1.4}
+  .gr .act{font-family:var(--mono);font-size:10.5px;color:var(--accent);letter-spacing:.5px}
+  .hflow{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+  .hn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:11px;padding:11px 14px;font-size:13px}
+  .hn b{color:#fff} .hn span{color:#c9c2dc;font-size:12px}
+  .hn .mono{color:var(--accent);font-size:11px}
+  .harr{color:var(--accent);text-align:center;font-size:14px}
+
+  .code{background:var(--indigo-deep);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px 24px;font-family:var(--mono);font-size:13.5px;line-height:2;color:#e8e6f0;max-width:720px}
+  .code .ok{color:#86d995;font-weight:700}.code .no{color:#f0a39c;font-weight:700}.code .cm{color:#8a7fae}.code .kw{color:var(--accent)}.code .str{color:#d8c79a}
+
+  .pay{display:grid;grid-template-columns:1fr 1fr;gap:0 42px}
+  .po{padding:14px 0;border-top:1px solid var(--hair)}
+  .po h5{font-size:15.5px;margin:0 0 4px} .po p{font-size:13px;color:var(--muted);margin:0;line-height:1.5}
+  .po .tag{font-family:var(--mono);font-size:10.5px;color:var(--accent);letter-spacing:.5px}
+  .fill{color:var(--accent-deep);font-weight:700;font-family:var(--mono)}
+
+  .flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:12px;margin-top:6px}
+  .fnode{background:var(--mist);border:1px solid var(--hair);border-radius:12px;padding:15px;text-align:center}
+  .fnode .ft{font-size:13.5px;font-weight:700} .fnode .fs{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+  .farr{color:var(--accent);font-size:17px;text-align:center}
+  .human{font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:.4px}
+
+  .grid-wrap{display:inline-grid;grid-template-columns:auto repeat(4,1fr);gap:8px;align-items:center}
+  .grid-wrap .col{font-family:var(--mono);font-size:9.5px;text-align:center;color:rgba(255,255,255,.55)}
+  .grid-wrap .row{font-family:var(--mono);font-size:9.5px;text-align:right;padding-right:5px;white-space:nowrap;color:rgba(255,255,255,.55)}
+  .gridcap{font-family:var(--mono);font-size:10.5px;letter-spacing:.3px;color:rgba(255,255,255,.6);margin-top:16px;text-align:center}
+  .cell{width:100%;aspect-ratio:1;border-radius:6px;min-width:28px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12)}
+  .cell.lit{background:var(--accent);border-color:var(--accent);box-shadow:0 4px 16px rgba(43,20,102,.38);opacity:0;transform:scale(.6)}
+  .animate .cell.lit{animation:pop .5s cubic-bezier(.2,1.4,.4,1) forwards}
+  @keyframes pop{to{opacity:1;transform:scale(1)}}
+
+  .btn{--_a:#a6a7ae;--_t:var(--_a);--_on:#fdfdfd;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:33px;padding:0 12px;border-radius:8px;border:1px solid transparent;background:var(--paper);color:var(--_t);box-shadow:0 1px 3px rgba(0,0,0,.12);font-family:var(--sans);font-size:13px;font-weight:500;white-space:nowrap}
+  .c-primary{--_a:#b5985a;--_on:#fdfdfd}.c-secondary{--_a:#190337;--_on:#fdfdfd}.c-error{--_a:#a82e24;--_on:#fdfdfd}.c-tertiary{--_a:#a6a7ae;--_t:#1b1b1b;--_on:#1b1b1b}
+  .btn[data-v=contained]{background:var(--_a);color:var(--_on);border:none;font-weight:600}
+  .btn[data-v=outlined]{border-color:var(--_a)} .btn[data-v=dashed]{border:1px dashed var(--_a);box-shadow:none} .btn[data-v=ghost]{background:transparent;border:none;box-shadow:none}
+  .btn.xs{height:23px;font-size:11px;font-weight:700} .btn.xs[data-v^=pill]{border-radius:999px}
+  .btn[data-v=pill-tonal]{background:var(--indigo-pale);border:none;box-shadow:none;border-radius:999px} .btn[data-v=pill-outlined]{border:.5px solid var(--_a);border-radius:999px}
+
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+  .panel{border-radius:14px;padding:17px 19px;border:1px solid var(--hair)}
+  .panel.bad{background:#fbf0ef;border-color:#e7c9c5}
+  .panel.good{background:#f1f6f1;border-color:#cfe6cf}
+  .panel .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;margin:0 0 12px}
+  .panel.bad .pl{color:var(--red)} .panel.good .pl{color:var(--green)}
+  .cluster{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .panel .note{font-size:11.5px;color:var(--muted);margin-top:13px;line-height:1.4}
+  .turn{font-size:16.5px;font-weight:600;margin-top:18px;text-align:center;line-height:1.5} .turn b{color:var(--accent-deep)}
+  @media(max-width:760px){.vs{grid-template-columns:1fr}}
+  .scene{border-left:3px solid var(--accent);padding:4px 0 4px 18px;margin:2px 0 4px;font-size:16px;line-height:1.55;color:var(--ink);max-width:740px}
+  .scene b{font-weight:700} .scene em{font-style:italic;color:var(--red)}
+  .scene .mini{display:flex;gap:10px;align-items:center;margin-top:13px;flex-wrap:wrap}
+  .scene .cx{font-family:var(--mono);font-size:11px;color:var(--red)}
+  .resolve{display:flex;flex-direction:column}
+  .rr{display:grid;grid-template-columns:1fr 26px 1fr;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--hair)}
+  .rr:first-child{border-top:none}
+  .rr .was{font-size:13px;color:var(--faint);text-decoration:line-through;text-decoration-color:rgba(168,46,36,.45)}
+  .rr .arr{color:var(--accent);text-align:center;font-size:15px}
+  .rr .now{font-size:14px;font-weight:600;color:var(--ink)}
+  .pipe{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .pnode{background:var(--mist);border:1px solid var(--hair);border-radius:10px;padding:9px 15px;font-size:13.5px;font-weight:600;color:var(--muted)}
+  .pnode.dim{opacity:.65}
+  .pnode.hot{background:var(--accent-tint);border-color:var(--accent);border-width:1.5px;color:var(--ink);box-shadow:0 3px 12px rgba(43,20,102,.22)}
+  .parr{color:var(--faint);font-size:15px}
+  .plabel{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;color:var(--faint);width:54px;flex:none;text-transform:uppercase}
+  .prow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .demo-panel{background:var(--n09);border:1px solid var(--hair);border-radius:14px;box-shadow:var(--shadow-sm);padding:18px 20px;width:100%;max-width:430px}
+  .dp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .dp-title{font-size:15px;font-weight:700}
+  .dp-badge{font-family:var(--mono);font-size:10px;letter-spacing:.6px;color:var(--accent-deep);background:var(--accent-tint);border:1px solid #d6ccef;border-radius:999px;padding:3px 10px}
+  .dp-row{display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--hair);font-size:13px}
+  .dp-row .dp-k{color:var(--muted)} .dp-row .dp-v{font-weight:600}
+  .dp-foot{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+  .dropzone{border:1.5px dashed var(--line);border-radius:12px;padding:20px;text-align:center;color:var(--muted);font-size:13.5px;background:var(--mist)}
+  .dropzone b{color:var(--accent-deep)}
+  .filerow{display:flex;align-items:center;gap:10px;margin-top:10px;padding:9px 12px;border:1px solid var(--hair);border-radius:10px;font-size:13px}
+  .filerow .fname{flex:1;font-weight:600} .filerow .fstat{font-family:var(--mono);font-size:10.5px;color:var(--green);letter-spacing:.5px}
+  .filerow .fdoc{width:15px;height:18px;border:1.5px solid var(--line);border-radius:2px;flex:none}
+  .demo-cap{font-size:13.5px;color:var(--muted);margin-top:16px;max-width:580px;line-height:1.5}
+  .shot{width:100%;max-width:640px;border:1px solid var(--hair);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm)}
+  .shot-bar{display:flex;align-items:center;gap:6px;padding:9px 13px;background:var(--mist);border-bottom:1px solid var(--hair);font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .shot-bar i{width:9px;height:9px;border-radius:50%;background:var(--n06);display:block}
+  .shot-body{height:250px;display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(45deg,var(--n09),var(--n09) 11px,#f5f5f8 11px,#f5f5f8 22px)}
+  .shot-note{text-align:center;color:var(--faint);font-size:14px;font-weight:600;background:var(--n09);padding:16px 24px;border-radius:10px;border:1.5px dashed var(--line)}
+  .shot-note small{display:block;margin-top:6px;font-weight:400}
+  .bar{position:fixed;left:0;right:0;bottom:0;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:15}
+  .bar .t{font-family:var(--mono);font-size:10.5px;letter-spacing:1.3px;color:rgba(255,255,255,.55);text-transform:uppercase}
+  .ctrl{display:flex;align-items:center;gap:9px}
+  .ctrl button{width:33px;height:33px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font-size:15px;cursor:pointer;transition:.18s}
+  .ctrl button:hover{background:var(--accent-bright);border-color:var(--accent-bright);color:var(--indigo)}
+  .ctrl .num{font-family:var(--mono);font-size:11.5px;color:rgba(255,255,255,.7);min-width:56px;text-align:center}
+  .dots{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:5px;z-index:15;max-width:84vw;flex-wrap:wrap;justify-content:center}
+  .dots b{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.26);cursor:pointer;transition:.22s}
+  .dots b.on{background:var(--accent-bright);width:18px;border-radius:4px}
+
+  @media(max-width:760px){.pad{padding:30px 24px}h1{font-size:30px}h2{font-size:23px}.statement{font-size:20px}
+    .two,.three,.pay,.gov,.flow{grid-template-columns:1fr}.layer+.layer{margin-left:0;margin-top:20px}.layer .ar{display:none}.farr{transform:rotate(90deg)}.cell{min-width:20px}}
+  @media(prefers-reduced-motion:reduce){.slide.on{animation:none}.cell.lit{opacity:1;transform:none}.animate .cell.lit{animation:none;opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="prog" id="prog"></div>
+<div class="deck">
+
+  <!-- 1 · COVER (总) -->
+  <section class="slide on dark"><div class="pad"><div class="body">
+    <div style="display:grid;grid-template-columns:1.15fr .85fr;gap:36px;align-items:center">
+      <div>
+        <p class="kick">Design Systems · Case Study</p>
+        <h1>Most design<br>systems skip<br>a layer.<br><span style="color:var(--accent)">Mine is built<br>on it.</span></h1>
+        <p class="role"><b>[Your name]</b> &mdash; Lead Designer<br>Sole author of the design system for Sands&rsquo; casino management suite · Macau &amp; Singapore</p>
+      </div>
+      <div style="justify-self:end;text-align:center">
+        <div class="grid-wrap" data-grid></div>
+        <p class="gridcap">6 variants &times; 4 colors = 24 possible &middot; <span style="color:var(--accent)">7 approved</span></p>
+      </div>
+    </div>
+  </div></div></section>
+
+  <!-- 2 · THE CHALLENGE (总: context + problem) -->
+  <section class="slide light"><div class="pad">
+    <p class="kick">The challenge</p>
+    <h2>Where consistency is compliance.</h2>
+    <p class="sub">The casino management suite for Las Vegas Sands runs under regulators in Macau and Singapore, grows constantly, and &mdash; for the design system &mdash; has one author: me.</p>
+    <div class="body">
+      <div class="stat-row" style="margin-bottom:4px">
+        <div class="stat"><div class="n">2</div><div class="k">regulated markets &mdash; Macau (DICJ) &amp; Singapore</div></div>
+        <div class="stat"><div class="n">566</div><div class="k">business requirements driving the UI</div></div>
+        <div class="stat"><div class="n">1</div><div class="k">design system, sole author, the whole suite</div></div>
+      </div>
+      <div class="scene">
+        It surfaced as one forked button: the same <b>&ldquo;Submit for approval&rdquo;</b> rendered differently across products. In an AML approval flow, a control someone has to <em>hesitate</em> over can fail an audit &mdash; and nothing decided which version was the real one.
+        <div class="mini">
+          <button class="btn" data-v="contained" style="--_a:#b5985a;--_on:#fff;height:31px">Submit for approval</button>
+          <button class="btn" data-v="contained" style="--_a:#190337;--_on:#fff;height:36px;border-radius:6px;font-weight:600">Submit for approval</button>
+          <span class="cx">same action · two products</span>
+        </div>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- 3 · THE APPROACH (总纲) -->
+  <section class="slide light"><div class="pad">
+    <p class="kick">The approach</p>
+    <h2>Possible isn&rsquo;t approved.</h2>
+    <p class="sub">Decide the approved set once, in code &mdash; types and docs derive from it. <b>One principle, four moves</b> &mdash; the rest of this deck.</p>
+    <div class="body">
+      <div class="two">
+        <div class="opt"><span class="tag">01 — Ground it</span><p class="h">Design from real scenarios</p><p class="p">Fast operational use vs considered back-office review. Those tensions set the rules.</p></div>
+        <div class="opt"><span class="tag">02 — Constrain</span><p class="h">Fewer options, more reuse</p><p class="p">Consistency beats choice: every option has to earn its place.</p></div>
+        <div class="opt hot"><span class="tag">03 — Govern in code</span><p class="h">An approved-set layer most systems skip</p><p class="p">The single source of truth &mdash; in code, not a wiki.</p></div>
+        <div class="opt"><span class="tag">04 — Enforce &amp; deepen</span><p class="h">Compiler-checked, patterns-deep</p><p class="p">TypeScript blocks off-spec; reuse extends to panels and CRUD patterns.</p></div>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- 4 · MOVE 01 · GROUND IT (分) -->
+  <section class="slide light"><div class="pad">
+    <p class="kick">Move 01 · Ground it</p>
+    <h2>Designed from the floor, not the canvas.</h2>
+    <p class="sub">Everything starts from the scenarios the system runs in. Two contexts pull opposite ways &mdash; and those tensions, not aesthetics, set the rules.</p>
+    <div class="body">
+      <div class="two">
+        <div class="opt"><span class="tag">Operational environment</span><p class="h">Glance &amp; act &mdash; speed wins</p><p class="p">On the floor, staff act under pressure. Every extra control is a delay; the UI has to be fast and unambiguous.</p></div>
+        <div class="opt"><span class="tag">Back office</span><p class="h">Review &amp; decide &mdash; clarity wins</p><p class="p">Shared, data-dense work. Legibility and structure matter more than density.</p></div>
+      </div>
+      <div class="chips">
+        <span class="chip">balance <b>clarity ⇄ speed</b> in every component</span>
+        <span class="chip">many <b>terminal sizes</b> &mdash; design for widest reuse</span>
+        <span class="chip">some flows must <b>port to touchscreen</b> later</span>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- 5 · MOVE 02 · CONSTRAIN (分) -->
+  <section class="slide light"><div class="pad">
+    <p class="kick">Move 02 · Constrain</p>
+    <h2>I&rsquo;ve watched one button become four.</h2>
+    <p class="sub">Leave every option open and the same &ldquo;Save&rdquo; drifts &mdash; a different size here, a different shape there. Nobody can hold it consistent.</p>
+    <div class="body">
+      <div class="vs">
+        <div class="panel bad">
+          <p class="pl">Open &mdash; the same Save, drifting</p>
+          <div class="cluster">
+            <button class="btn" data-v="contained" style="--_a:#b5985a;--_on:#fff;height:40px;border-radius:13px">Save</button>
+            <button class="btn" data-v="contained" style="--_a:#190337;--_on:#fff;height:29px;border-radius:4px;font-weight:500">Save</button>
+            <button class="btn" data-v="outlined" style="--_a:#190337;--_t:#190337;height:34px;border-radius:8px;font-weight:700">Save</button>
+            <button class="btn" data-v="contained" style="--_a:#b5985a;--_on:#fff;height:27px;border-radius:999px">Save</button>
+          </div>
+          <p class="note">Four takes on one action. Now multiply by every screen and team.</p>
+        </div>
+        <div class="panel good">
+          <p class="pl">Governed &mdash; one Save, everywhere</p>
+          <div class="cluster">
+            <button class="btn c-primary" data-v="contained">Save</button>
+          </div>
+          <p class="note">One shape, one token &mdash; only the size flexes, for floor vs back office.</p>
+        </div>
+      </div>
+      <p class="turn"><b>Every option has to earn its place</b> &mdash; so I gave the system a layer that decides which ones do.</p>
+    </div>
+  </div></section>
+
+  <!-- MOVE 03 · GOVERN IN CODE (one page) -->
+  <section class="slide light"><div class="pad">
+    <p class="kick">Move 03 · Govern in code</p>
+    <h2>The layer most systems skip.</h2>
+    <div class="body">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="prow">
+          <span class="plabel">Most</span>
+          <div class="pipe">
+            <span class="pnode dim">tokens</span><span class="parr">&rarr;</span>
+            <span class="pnode dim">components</span><span class="parr">&rarr;</span>
+            <span class="pnode dim">app</span>
+          </div>
+        </div>
+        <div class="prow">
+          <span class="plabel">Mine</span>
+          <div class="pipe">
+            <span class="pnode">tokens</span><span class="parr">&rarr;</span>
+            <span class="pnode">capability</span><span class="parr">&rarr;</span>
+            <span class="pnode hot">whitelist &middot; governance</span><span class="parr">&rarr;</span>
+            <span class="pnode">app</span>
+          </div>
+        </div>
+      </div>
+      <p class="sub" style="margin-top:16px">Most systems keep the rules in a doc. I made the approved set a layer in the system itself &mdash; and everything else follows from it:</p>
+      <ul class="pts" style="margin-top:2px">
+        <li><b>Composed from axes.</b> <span class="s">variant &times; color &times; size, one rule &mdash; color is the accent.</span></li>
+        <li><b>One source, derived.</b> <span class="s">the catalog generates the developer&rsquo;s types and the designer&rsquo;s docs (live in Storybook) &mdash; they can&rsquo;t fall out of sync.</span></li>
+        <li><b>Centralized handoff.</b> <span class="s">I push to git; devs diff design-lib vs app-lib and sync on their release.</span></li>
+      </ul>
+    </div>
+  </div></section>
+
+  <!-- MOVE 04 · ENFORCE & DEEPEN (one page) -->
+  <section class="slide dark"><div class="pad">
+    <p class="kick">Move 04 · Enforce &amp; deepen</p>
+    <h2 style="color:#fff">Governance the compiler can&rsquo;t ignore.</h2>
+    <div class="body">
+      <div class="code">
+        <span class="cm">// approved — compiles</span><br>
+        &lt;<span class="kw">TextButton</span> variant=<span class="str">"contained"</span> color=<span class="str">"primary"</span>&gt; <span class="ok">&#10003;</span><br>
+        <span class="cm">// off-spec — won&rsquo;t compile</span><br>
+        &lt;<span class="kw">TextButton</span> variant=<span class="no">"contained"</span> color=<span class="no">"tertiary"</span>&gt; <span class="no">&#10007;</span>
+      </div>
+      <p class="sub" style="margin-top:18px">TypeScript turns the whitelist into a hard constraint &mdash; a developer can&rsquo;t go off-spec; the editor stops it before commit. And reuse doesn&rsquo;t stop at the button: <b>it goes from primitive to pattern</b> &mdash; shown next.</p>
+    </div>
+  </div></section>
+
+  <!-- SHOWCASE · COMPONENT (btn) -->
+  <section class="slide light"><div class="pad">
+    <p class="kick">Showcase · Component</p>
+    <h2>The primitive: one governed button.</h2>
+    <p class="sub">The atom everything composes from &mdash; the approved set, rendered from the real component.</p>
+    <div class="body">
+      <div class="specs" style="gap:14px">
+        <button class="btn c-primary" data-v="contained">Submit</button>
+        <button class="btn c-secondary" data-v="contained">Confirm</button>
+        <button class="btn c-error" data-v="contained">Delete</button>
+        <button class="btn c-tertiary" data-v="outlined">Cancel</button>
+        <button class="btn c-error" data-v="outlined">Void</button>
+        <button class="btn c-secondary" data-v="dashed">+ Add filter</button>
+        <button class="btn c-tertiary" data-v="ghost">More</button>
+      </div>
+      <p class="demo-cap">Seven approved variants, two sizes &mdash; every other combination is a compile error.</p>
+    </div>
+  </div></section>
+
+  <!-- SHOWCASE · COMPOSED COMPONENT (info panel) -->
+  <section class="slide light"><div class="pad">
+    <p class="kick">Showcase · Composed component</p>
+    <h2>Composed: an info panel, reused whole.</h2>
+    <p class="sub">Primitives assembled into a recurring unit &mdash; the same panel wherever a record is reviewed.</p>
+    <div class="body" style="align-items:flex-start">
+      <div class="demo-panel">
+        <div class="dp-head"><span class="dp-title">Patron &middot; #10293</span><span class="dp-badge">IN REVIEW</span></div>
+        <div class="dp-row"><span class="dp-k">Risk level</span><span class="dp-v">Medium</span></div>
+        <div class="dp-row"><span class="dp-k">Source of funds</span><span class="dp-v">Verified</span></div>
+        <div class="dp-row"><span class="dp-k">Assigned</span><span class="dp-v">L. Tan</span></div>
+        <div class="dp-foot">
+          <button class="btn c-tertiary" data-v="outlined">Cancel</button>
+          <button class="btn c-primary" data-v="contained">Approve</button>
+        </div>
+      </div>
+      <p class="demo-cap">Header, fields, and actions are all governed primitives &mdash; so every panel in the suite reads and behaves the same.</p>
+    </div>
+  </div></section>
+
+  <!-- SHOWCASE · PATTERN (upload doc) -->
+  <section class="slide light"><div class="pad">
+    <p class="kick">Showcase · Pattern</p>
+    <h2>A pattern: document upload, the same everywhere.</h2>
+    <p class="sub">An interaction pattern defined once &mdash; upload, validate, attach &mdash; reused across every flow that needs evidence.</p>
+    <div class="body" style="align-items:flex-start">
+      <div class="demo-panel" style="max-width:470px">
+        <div class="dp-title" style="margin-bottom:12px">Upload supporting document</div>
+        <div class="dropzone">Drag a file here, or <b>browse</b></div>
+        <div class="filerow"><span class="fdoc"></span><span class="fname">id-verification.pdf</span><span class="fstat">UPLOADED</span></div>
+        <div class="dp-foot">
+          <button class="btn c-tertiary" data-v="ghost">Cancel</button>
+          <button class="btn c-primary" data-v="contained">Attach</button>
+        </div>
+      </div>
+      <p class="demo-cap">The upload/CRUD behavior &mdash; states, validation, the attach action &mdash; is shared, so it stays consistent and developers don&rsquo;t reinvent it.</p>
+    </div>
+  </div></section>
+
+  <!-- DELIVERY · STORYBOOK (screenshot) -->
+  <section class="slide light"><div class="pad">
+    <p class="kick">Delivery</p>
+    <h2>Shipped as living docs in Storybook.</h2>
+    <p class="sub">Every approved pattern, rendered from the real component &mdash; one source designers and developers share.</p>
+    <div class="body" style="align-items:center">
+      <div class="shot">
+        <div class="shot-bar"><i></i><i></i><i></i><span style="margin-left:6px">localhost:6006 &middot; Components / Button</span></div>
+        <div class="shot-body">
+          <div class="shot-note">Paste your Storybook screenshot here<small>Components &rarr; Button: Docs &middot; Approved set &middot; Playground &middot; States</small></div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- 12 · IMPACT (收) -->
+  <section class="slide light"><div class="pad">
+    <p class="kick">Impact</p>
+    <h2>Now &ldquo;Submit for approval&rdquo; means one thing.</h2>
+    <div class="scene" style="border-color:var(--green)">
+      The forked button that started this can only render one way now &mdash; the same control, on every product, on every screen.
+      <div class="mini"><button class="btn c-primary" data-v="contained" style="height:34px">Submit for approval</button><span class="cx" style="color:var(--green)">one action · one face · the whole suite</span></div>
+    </div>
+    <div class="body">
+      <div class="resolve">
+        <div class="rr"><span class="was">anyone ships an unapproved control</span><span class="arr">&rarr;</span><span class="now">off-spec won&rsquo;t compile</span></div>
+        <div class="rr"><span class="was">code and docs drift apart</span><span class="arr">&rarr;</span><span class="now">one source feeds both</span></div>
+        <div class="rr"><span class="was">specs go stale</span><span class="arr">&rarr;</span><span class="now">docs generated from the catalog</span></div>
+        <div class="rr"><span class="was">designers can&rsquo;t read the code</span><span class="arr">&rarr;</span><span class="now">one artifact, both audiences</span></div>
+      </div>
+      <p class="sub" style="margin-top:14px;font-size:13px"><span class="fill">[ add your numbers ]</span> &mdash; review cycles ↓, time-to-add-a-component ↓, off-spec UI bugs ↓ since adoption. Real figures land hardest here.</p>
+    </div>
+  </div></section>
+
+  <!-- 13 · REFLECTION (收) -->
+  <section class="slide dark"><div class="pad"><div class="body">
+    <div style="display:grid;grid-template-columns:1.15fr .85fr;gap:36px;align-items:center">
+      <div>
+        <p class="kick">Reflection</p>
+        <h1 style="color:#fff;font-size:40px">The deliverable<br>was the <span style="color:var(--accent)">method.</span></h1>
+        <p class="sub">The button was the proof. The lasting value is a way of building &mdash; grounded in real scenarios, constrained on purpose, governed in code, enforced by the compiler, and deep enough to cover behavior.</p>
+        <p class="role" style="margin-top:18px">Next: versioning + adoption metrics, and a light contribution path &mdash; so the system keeps earning its place as it scales beyond one author.</p>
+      </div>
+      <div style="justify-self:end;text-align:center">
+        <div class="grid-wrap" data-grid></div>
+        <p class="gridcap">24 possible &middot; <span style="color:var(--accent)">7 approved</span> &mdash; on purpose</p>
+      </div>
+    </div>
+  </div></div></section>
+
+
+<div class="dots" id="dots"></div>
+<div class="bar">
+  <span class="t">Possible / Approved &mdash; A Method</span>
+  <div class="ctrl"><button id="prev">&lsaquo;</button><span class="num"><span id="cur">1</span> / <span id="tot">13</span></span><button id="next">&rsaquo;</button></div>
+</div>
+
+<script>
+  const V=['contained','outlined','dashed','ghost','pill-tonal','pill-outlined'],C=['primary','secondary','error','tertiary'];
+  const AP=new Set(['contained|primary','contained|secondary','contained|error','outlined|tertiary','outlined|error','dashed|secondary','ghost|tertiary']);
+  function build(el){el.innerHTML='';el.appendChild(document.createElement('div'));
+    C.forEach(c=>{const h=document.createElement('div');h.className='col';h.textContent=c.slice(0,3);el.appendChild(h);});
+    let o=0;V.forEach(v=>{const r=document.createElement('div');r.className='row';r.textContent=v.replace('pill-','p-');el.appendChild(r);
+      C.forEach(c=>{const x=document.createElement('div');x.className='cell';if(AP.has(v+'|'+c)){x.classList.add('lit');x.style.animationDelay=(o++*90)+'ms';}el.appendChild(x);});});}
+  document.querySelectorAll('[data-grid]').forEach(build);
+  const S=[...document.querySelectorAll('.slide')],D=document.getElementById('dots'),cur=document.getElementById('cur'),prog=document.getElementById('prog');
+  document.getElementById('tot').textContent=S.length;let i=0;
+  S.forEach((_,n)=>{const b=document.createElement('b');b.onclick=()=>go(n);D.appendChild(b);});const dd=[...D.children];
+  function go(n){i=Math.max(0,Math.min(S.length-1,n));
+    S.forEach((s,k)=>{const a=k===i;s.classList.toggle('on',a);if(a){const g=s.querySelector('.grid-wrap');if(g){g.classList.remove('animate');void g.offsetWidth;g.classList.add('animate');}}});
+    dd.forEach((b,k)=>b.classList.toggle('on',k===i));cur.textContent=i+1;prog.style.width=(i/(S.length-1)*100)+'%';}
+  document.getElementById('next').onclick=()=>go(i+1);document.getElementById('prev').onclick=()=>go(i-1);
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(i+1);}if(e.key==='ArrowLeft')go(i-1);});go(0);
+</script>
+</body>
+</html>

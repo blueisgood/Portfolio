@@ -38,9 +38,10 @@
 
   /* ---------- top bar ---------- */
   .top{ position:fixed; top:0; left:0; right:0; z-index:40;
-    display:flex; align-items:flex-start; justify-content:space-between;
+    display:grid; grid-template-columns:1fr auto 1fr; align-items:flex-start;
     padding:var(--pad) var(--pad) 0; }
   .brandwrap{ display:flex; flex-direction:column; gap:5px; }
+  .top>.music{ justify-self:end; }
   .role{ font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--ash); }
   .brand{ font-family:var(--disp); font-weight:800; font-size:15px; letter-spacing:.02em; }
   .brand sup{ font-size:.55em; vertical-align:super; font-weight:700; }
@@ -222,10 +223,9 @@
       <button id="navAbout">About</button>
       <button id="navContact">Contact</button>
     </nav>
-    <button class="music" id="music" aria-pressed="false" aria-label="Toggle ambient music"><span class="eq"><i></i><i></i><i></i></span><span class="mlabel">MUSIC</span></button>
+    <button class="music on" id="music" aria-pressed="true" aria-label="Toggle sound effects"><span class="eq"><i></i><i></i><i></i></span><span class="mlabel">SOUND EFFECT</span></button>
   </header>
 
-  <div class="hud tr"><span class="v" id="clock">00:00:00</span></div>
   <div class="hud bl"><span class="v" id="blurb">—</span></div>
 
   <button class="arrow prev" id="prev" aria-label="Previous project">‹</button>
@@ -372,7 +372,7 @@
     busy=true;
     const p=PROJECTS[to];
     dir = dir || 1;
-    if(audioOn) sfx();
+    if(audioOn && !first) sfx();
 
     // incoming shot layer
     const shot=document.createElement('div');
@@ -481,51 +481,33 @@
   $('gateCancel').addEventListener('click', closeGate);
   $('cvClose').addEventListener('click', closeViewer);
 
-  /* ambient music engine (Web Audio — synthesised, self-contained) */
+  /* sound-effects engine (Web Audio — synthesised, self-contained; no background music) */
   const musicBtn=$('music');
-  let actx=null, master=null, ambientReady=false, audioOn=false;
-  function initAudio(){
-    if(actx) return;
-    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
-    actx=new AC();
-    master=actx.createGain(); master.gain.value=0; master.connect(actx.destination);
-    startAmbient();
-  }
-  function startAmbient(){
-    if(ambientReady) return; ambientReady=true;
-    const bed=actx.createGain(); bed.gain.value=1; bed.connect(master);
-    const filter=actx.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value=650; filter.Q.value=0.6; filter.connect(bed);
-    // soft open-fifth chord, each note slightly detuned for warmth
-    [110,164.81,220,329.63].forEach((f,i)=>{
-      const g=actx.createGain(); g.gain.value=0.09/(i*0.6+1); g.connect(filter);
-      [f, f*1.004].forEach(fr=>{ const o=actx.createOscillator(); o.type='sine'; o.frequency.value=fr; o.connect(g); o.start(); });
-    });
-    // slow filter sweep for movement
-    const lfo=actx.createOscillator(); lfo.frequency.value=0.05; const lg=actx.createGain(); lg.gain.value=260;
-    lfo.connect(lg); lg.connect(filter.frequency); lfo.start();
-    // gentle breathing on the bed
-    const blfo=actx.createOscillator(); blfo.frequency.value=0.07; const bg=actx.createGain(); bg.gain.value=0.18;
-    blfo.connect(bg); bg.connect(bed.gain); blfo.start();
-  }
-  function toggleMusic(){
-    initAudio(); if(!actx) return;
+  let actx=null, master=null, audioOn=true;   // sound effects ON by default
+  function ensureAudio(){
+    if(!actx){
+      const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+      actx=new AC();
+      master=actx.createGain(); master.gain.value=0.7; master.connect(actx.destination);
+    }
     if(actx.state==='suspended') actx.resume();
+  }
+  function toggleSound(){
     audioOn=!audioOn;
-    master.gain.cancelScheduledValues(actx.currentTime);
-    master.gain.setTargetAtTime(audioOn?0.38:0.0, actx.currentTime, audioOn?0.6:0.35);
+    if(audioOn) ensureAudio();
     musicBtn.classList.toggle('on', audioOn);
     musicBtn.setAttribute('aria-pressed', audioOn?'true':'false');
   }
   // per-transition sound: a soft shutter click + a pentatonic note
   function sfx(){
-    if(!audioOn||!actx) return;
+    if(!audioOn) return;
+    ensureAudio(); if(!actx) return;
     const t=actx.currentTime;
     const notes=[523.25,587.33,659.25,783.99,880.0];
     const o=actx.createOscillator(); o.type='triangle'; o.frequency.value=notes[(Math.random()*notes.length)|0];
     const g=actx.createGain(); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.22,t+0.01);
     g.gain.exponentialRampToValueAtTime(0.0001,t+0.5);
     o.connect(g); g.connect(master); o.start(t); o.stop(t+0.55);
-    // shutter click: short band-passed noise burst
     const dur=0.05, buf=actx.createBuffer(1, Math.max(1,(actx.sampleRate*dur)|0), actx.sampleRate), d=buf.getChannelData(0);
     for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
     const ns=actx.createBufferSource(); ns.buffer=buf;
@@ -533,15 +515,7 @@
     const ng=actx.createGain(); ng.gain.value=0.16;
     ns.connect(nf); nf.connect(ng); ng.connect(master); ns.start(t);
   }
-  musicBtn.addEventListener('click', toggleMusic);
-
-  /* live clock */
-  function tick(){
-    const d=new Date();
-    $('clock').textContent=[d.getHours(),d.getMinutes(),d.getSeconds()]
-      .map(n=>String(n).padStart(2,'0')).join(':');
-  }
-  tick(); setInterval(tick,1000);
+  musicBtn.addEventListener('click', toggleSound);
 
   /* ---- boot ---- */
   const bootExp=$('bootExp');

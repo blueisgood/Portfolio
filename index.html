@@ -94,11 +94,6 @@
   .credits .dot{ color:var(--rule); }
 
   /* prev / next (also for touch) */
-  .arrow{ position:fixed; top:50%; transform:translateY(-50%); z-index:38; width:54px; height:54px;
-    display:flex; align-items:center; justify-content:center; color:var(--ash); font-size:20px; transition:color .25s; }
-  .arrow:hover{ color:var(--ink); }
-  .arrow.prev{ left:calc(var(--pad) - 6px); }
-  .arrow.next{ right:calc(var(--pad) - 6px); }
 
   /* ---------- bottom navigator (the reel) ---------- */
   .navbar{ position:fixed; left:0; right:0; bottom:0; z-index:40; padding:0 var(--pad) var(--pad);
@@ -148,7 +143,6 @@
     .topnav{ display:none; }
     .framewrap{ width:88vw; }
     .hud.bl,.hud.br{ display:none; }
-    .arrow{ display:none; }
   }
   @media (prefers-reduced-motion: reduce){
     .rec i{ animation:none; }
@@ -202,13 +196,47 @@
   .music.on .eq i:nth-child(3){ animation-delay:.34s; }
   @keyframes eq{ 0%,100%{height:3px} 50%{height:11px} }
 
+  /* custom cursor */
+  html, body, .stage, .viewer, .navbar { cursor: none !important; }
+  .gate, .about, .caseviewer, input, button { cursor: auto; }
+  #cur-dot{
+    position:fixed; z-index:200; pointer-events:none;
+    top:0; left:0; will-change:transform;
+    display:flex; align-items:center; justify-content:center;
+  }
+  /* the ring */
+  #cur-ring{
+    width:38px; height:38px; border-radius:50%;
+    border:1.5px solid var(--ink); opacity:.7;
+    transition:width .18s ease, height .18s ease, opacity .18s ease,
+                border-color .18s ease, background .18s ease;
+    display:flex; align-items:center; justify-content:center;
+  }
+  /* nav label that appears left/right */
+  #cur-label{
+    position:absolute; white-space:nowrap;
+    font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--ink);
+    opacity:0; transition:opacity .2s ease;
+    pointer-events:none;
+  }
+  /* states */
+  .cur-inside #cur-ring{ width:56px; height:56px; opacity:.45; }
+  .cur-prev #cur-ring, .cur-next #cur-ring{ width:0; height:0; opacity:0; border:none; }
+  .cur-prev #cur-label, .cur-next #cur-label{ opacity:1; }
+
   :focus-visible{ outline:2px solid var(--ink); outline-offset:3px; }
 </style>
 </head>
 <body>
 
   <!-- intro -->
-  <div id="loader">
+  <div id="cur-dot" aria-hidden="true">
+  <div id="cur-ring"></div>
+  <span id="cur-label"></span>
+</div>
+
+<div id="loader">
     <div class="nm" id="bootName">TONG WEN</div>
     <div class="exp" id="bootExp">EXPOSURE 000</div>
   </div>
@@ -228,8 +256,6 @@
 
   <div class="hud bl"><span class="v" id="blurb">—</span></div>
 
-  <button class="arrow prev" id="prev" aria-label="Previous project">‹</button>
-  <button class="arrow next" id="next" aria-label="Next project">›</button>
 
   <main class="stage">
    <div class="framewrap">
@@ -447,8 +473,6 @@
     if(e.key==='ArrowRight'||e.key==='ArrowDown'){ e.preventDefault(); step(1); }
     if(e.key==='ArrowLeft' ||e.key==='ArrowUp'){ e.preventDefault(); step(-1); }
   });
-  $('next').addEventListener('click',()=>step(1));
-  $('prev').addEventListener('click',()=>step(-1));
   $('fprev').addEventListener('click',()=>step(-1));
   $('fnext').addEventListener('click',()=>step(1));
 
@@ -516,6 +540,72 @@
     ns.connect(nf); nf.connect(ng); ng.connect(master); ns.start(t);
   }
   musicBtn.addEventListener('click', toggleSound);
+
+  /* ---- custom cursor ---- */
+  (function(){
+    const dot=document.getElementById('cur-dot');
+    const ring=document.getElementById('cur-ring');
+    const lbl=document.getElementById('cur-label');
+    if(!dot) return;
+    let cx=window.innerWidth/2, cy=window.innerHeight/2;   // rendered pos (lerped)
+    let tx=cx, ty=cy;                                       // target (raw mouse)
+    let mode='default';  // 'default' | 'inside' | 'prev' | 'next'
+
+    function setMode(m,text=''){
+      if(mode===m) return;
+      mode=m;
+      dot.className='';
+      if(m==='inside') dot.classList.add('cur-inside');
+      if(m==='prev'){ dot.classList.add('cur-prev'); lbl.textContent=text||'‹ PREV'; }
+      if(m==='next'){ dot.classList.add('cur-next'); lbl.textContent=text||'NEXT ›'; }
+      if(m==='default') lbl.textContent='';
+    }
+
+    // smooth follow
+    let raf;
+    function loop(){
+      cx=tx; cy=ty;
+      dot.style.transform=`translate(${cx-20}px,${cy-20}px)`;
+      raf=requestAnimationFrame(loop);
+    }
+    loop();
+
+    document.addEventListener('mousemove', e=>{
+      tx=e.clientX; ty=e.clientY;
+      const vwr=document.getElementById('viewer');
+      if(!vwr){ setMode('default'); return; }
+      const r=vwr.getBoundingClientRect();
+      const mx=e.clientX, my=e.clientY;
+      // expand hit zones: left/right thirds of the viewport (outside the card)
+      const nb=document.querySelector('.navbar');
+      const nr=nb?nb.getBoundingClientRect():{top:window.innerHeight};
+      const inNavbar = my >= nr.top;
+      const leftZone  = !inNavbar && mx < r.left;
+      const rightZone = !inNavbar && mx > r.right;
+      const insideCard= !inNavbar && mx>=r.left && mx<=r.right && my>=r.top && my<=r.bottom;
+      if(insideCard){
+        setMode('inside');
+      } else if(leftZone){
+        setMode('prev','‹  PREV');
+      } else if(rightZone){
+        setMode('next','NEXT  ›');
+      } else {
+        setMode('default');
+      }
+    });
+
+    // click anywhere left/right zone navigates
+    document.addEventListener('click', e=>{
+      if(overlayOpen()) return;
+      const vwr=document.getElementById('viewer');
+      if(!vwr) return;
+      const r=vwr.getBoundingClientRect();
+      if(e.clientX < r.left)  step(-1);
+      if(e.clientX > r.right) step(1);
+    });
+
+    document.addEventListener('mouseleave', ()=>setMode('default'));
+  })();
 
   /* ---- boot ---- */
   const bootExp=$('bootExp');

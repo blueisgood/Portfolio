@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Next Gen TGT — Design Research (Apple)</title>
+<style>
+  /* ── Apple / Keynote tokens ── */
+  :root{
+    --black:#000000;
+    --white:#FFFFFF;
+    --grey-bg:#F5F5F7;      /* Apple light section */
+    --ink-d:#F5F5F7;        /* headline on dark */
+    --ink-l:#1D1D1F;        /* headline on light */
+    --sub:#86868B;          /* apple grey subtext */
+    --blue-d:#E3C177;       /* Sands gold accent on dark (bright, pops on black) */
+    --blue-l:#B8863B;       /* Sands gold accent on light (deep, readable on white) */
+    --rail:212px;
+    /* SF Pro Display is the system font on Apple devices */
+    --sf:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Helvetica,Arial,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:#0a0a0a; color:var(--ink-d); font-family:var(--sf);
+    -webkit-font-smoothing:antialiased; overflow:hidden; padding-left:var(--rail);
+    display:flex; align-items:center; justify-content:center; height:100vh;
+  }
+  #stage{position:relative; width:1280px; height:720px; transform-origin:center;
+    box-shadow:0 24px 90px rgba(0,0,0,.6); overflow:hidden; border-radius:2px;}
+  .slide{position:absolute; inset:0; width:1280px; height:720px; overflow:hidden;
+    opacity:0; visibility:hidden; transition:opacity .4s ease; z-index:1;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 90px;}
+  .slide.active{opacity:1; visibility:visible; z-index:2}
+  .dark{background:var(--black); color:var(--ink-d)}
+  .light{background:var(--white); color:var(--ink-l)}
+  .grey{background:var(--grey-bg); color:var(--ink-l)}
+
+  /* typography — Apple keynote scale */
+  .eyebrow{font-size:21px; font-weight:600; letter-spacing:-.01em; margin-bottom:14px;}
+  .dark .eyebrow{color:var(--blue-d)} .light .eyebrow,.grey .eyebrow{color:var(--blue-l)}
+  h1.hero{font-size:88px; font-weight:600; line-height:1.05; letter-spacing:-.03em;}
+  h1.big{font-size:64px; font-weight:600; line-height:1.07; letter-spacing:-.025em;}
+  h1.mid{font-size:48px; font-weight:600; line-height:1.1; letter-spacing:-.02em;}
+  .sub{font-size:28px; font-weight:400; letter-spacing:-.01em; margin-top:22px; max-width:900px;}
+  .dark .sub{color:var(--sub)} .light .sub,.grey .sub{color:var(--sub)}
+  .tiny{font-size:19px; color:var(--sub); margin-top:16px}
+  /* gradient text accent — original blue→purple→pink */
+  .grad{background:linear-gradient(90deg,#2997FF,#a15ffb 55%,#ff5e8a);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .grad-warm{background:linear-gradient(90deg,#ff8a3d,#ff5e8a);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .blue-d{color:var(--blue-d)} .blue-l{color:var(--blue-l)}
+  /* pill */
+  .pill{display:inline-block;margin-top:34px;font-size:19px;font-weight:400;padding:11px 24px;border-radius:980px;}
+  .dark .pill{background:var(--blue-d);color:#000} .light .pill{background:var(--blue-l);color:#fff}
+
+  /* left-aligned content slides (non-statement) */
+  .lslide{align-items:stretch;text-align:left;padding:0}
+  .lslide .head{position:absolute;left:80px;top:60px;right:80px}
+  .lslide .eyebrow{margin-bottom:8px}
+  .lslide h2{font-size:44px;font-weight:600;letter-spacing:-.02em;line-height:1.1}
+
+  .pageno{position:absolute;right:60px;bottom:38px;font-size:15px;color:var(--sub)}
+  .foot{position:absolute;left:80px;bottom:38px;font-size:15px;color:var(--sub)}
+
+  /* framed screenshot — Apple soft shadow, rounded */
+  .shot{position:absolute;overflow:hidden;border-radius:14px;background:#111;
+    box-shadow:0 30px 60px rgba(0,0,0,.35);border:1px solid rgba(0,0,0,.06)}
+  .light .shot,.grey .shot{box-shadow:0 30px 60px rgba(0,0,0,.14)}
+  .shot img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+  .shot .lbl{position:absolute;left:14px;top:12px;font-size:13px;font-weight:600;color:#fff;
+    background:rgba(0,0,0,.5);padding:4px 12px;border-radius:980px;backdrop-filter:blur(6px)}
+
+  .embed-frame{position:absolute;overflow:hidden;background:#000}
+  .embed-frame iframe{border:0;display:block}
+  /* portable-device / surface wrapper for an embedded UI */
+  .device-surface{position:absolute;display:flex;align-items:center;justify-content:center;}
+  .device-chassis{position:relative;background:#1a1a1c;border-radius:26px;padding:16px;
+    box-shadow:0 40px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06) inset, 0 2px 0 rgba(255,255,255,.08) inset;}
+  .device-chassis::after{content:'';position:absolute;left:50%;transform:translateX(-50%);
+    bottom:-46px;width:180px;height:14px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.55),transparent 70%);}
+  .device-screen{position:relative;border-radius:12px;overflow:hidden;background:#000;
+    box-shadow:0 0 0 1px rgba(0,0,0,.6) inset;}
+  .device-screen iframe{border:0;display:block;transform-origin:top left;}
+  /* thin front-camera dot on the top bezel */
+  .device-cam{position:absolute;top:7px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:#3a3a3d;}
+  /* large monitor / display */
+  .monitor{position:relative;background:#1c1c1e;border-radius:16px;padding:14px;
+    box-shadow:0 40px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.05) inset;}
+  .monitor .screen{position:relative;border-radius:6px;overflow:hidden;background:#000;box-shadow:0 0 0 1px rgba(0,0,0,.6) inset;}
+  .monitor .screen iframe{border:0;display:block;}
+  /* monitor stand */
+  .monitor-stand{position:absolute;left:50%;transform:translateX(-50%);bottom:-58px;width:120px;height:58px;
+    background:linear-gradient(#232326,#171719);clip-path:polygon(38% 0,62% 0,80% 100%,20% 100%);}
+  .monitor-base{position:absolute;left:50%;transform:translateX(-50%);bottom:-66px;width:280px;height:12px;border-radius:6px;
+    background:#1a1a1c;box-shadow:0 8px 20px rgba(0,0,0,.5);}
+  /* gaming-table terminal (upright touchscreen on a stand, standing on the felt) */
+  .terminal{position:relative;background:#141312;border-radius:18px;padding:16px;
+    box-shadow:0 30px 70px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.05) inset;}
+  .terminal .tscreen{position:relative;border-radius:8px;overflow:hidden;background:#000;box-shadow:0 0 0 1px rgba(0,0,0,.7) inset;}
+  .terminal .tscreen iframe{border:0;display:block;}
+  /* neck (stand) descending into the felt */
+  .terminal-neck{position:absolute;left:50%;transform:translateX(-50%);bottom:-40px;width:70px;height:44px;
+    background:linear-gradient(#26231f,#161412);border-radius:0 0 6px 6px;}
+  /* base plate resting on the felt */
+  .terminal-base{position:absolute;left:50%;transform:translateX(-50%);bottom:-52px;width:230px;height:20px;border-radius:50%;
+    background:radial-gradient(ellipse,#1c1a17 0%,#0f0d0b 70%,transparent 100%);}
+
+  /* quadrant (slide 3) */
+  .qbox{position:absolute}
+  .qaxis{position:absolute;background:rgba(0,0,0,.18)}
+  .qsweet{position:absolute;background:rgba(0,113,227,.08);border-radius:0 12px 0 0}
+  .qdot{position:absolute;border-radius:50%;transform:translate(-50%,-50%)}
+  .qlab{position:absolute;transform:translateX(-50%);text-align:center;white-space:nowrap}
+  .qlab .n{font-size:16px;font-weight:600;color:var(--ink-l)} .qlab.best .n{color:var(--blue-l)}
+  .qlab .d{font-size:12px;color:var(--sub);margin-top:3px}
+  .qaxl{position:absolute;font-size:12px;font-weight:600;letter-spacing:.02em;color:var(--sub)}
+
+  /* strategy tiles */
+  .tiles{position:absolute;left:80px;right:80px;top:240px;display:flex;gap:20px}
+  .tile{flex:1;background:var(--grey-bg);border-radius:20px;padding:26px 24px;min-height:210px;display:flex;flex-direction:column}
+  .tile .n{font-size:15px;font-weight:600;color:var(--blue-l)}
+  .tile .ic{flex:1;display:flex;align-items:center;justify-content:center}
+  .tile .nm{font-size:22px;font-weight:600;color:var(--ink-l)}
+  /* compact 2×4 grid variant */
+  .grid8{position:absolute;left:80px;right:80px;top:210px;display:grid;
+    grid-template-columns:repeat(4,1fr);gap:16px}
+  .tile8{background:var(--grey-bg);border-radius:16px;padding:20px;height:190px;display:flex;flex-direction:column;gap:12px}
+  .tile8 .ic{flex:1;display:flex;align-items:flex-start}
+  .tile8 .nm{font-size:19px;font-weight:600;color:var(--ink-l);letter-spacing:-.01em}
+  .tile8 .ds{font-size:13px;color:var(--sub);line-height:1.35;margin-top:2px}
+
+  /* timeline */
+  .tl{position:absolute;height:2px;background:rgba(0,0,0,.18)}
+  .tlnode{position:absolute;transform:translateX(-50%)}
+  .tlnode .mk{width:14px;height:14px;background:#fff;border:2.5px solid var(--ink-l);border-radius:50%;margin:0 auto}
+  .tlnode.end .mk{background:var(--blue-l);border-color:var(--blue-l)}
+  .tlnode .t{position:absolute;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}
+  .tlnode .t .n{font-size:16px;font-weight:600;color:var(--ink-l)} .tlnode.end .t .n{color:var(--blue-l)}
+  .tlnode .t .s{font-size:12px;color:var(--sub);margin-top:2px}
+  .soc{position:absolute;display:flex;align-items:center}
+  .soc .st{font-size:36px;font-weight:600;letter-spacing:-.02em} .soc .st.last{color:var(--blue-l)}
+  .soc .ar{flex:1;height:1.5px;background:rgba(0,0,0,.2);margin:0 24px;position:relative}
+  .soc .ar::after{content:'';position:absolute;right:-1px;top:-4px;border-left:9px solid rgba(0,0,0,.35);border-top:5px solid transparent;border-bottom:5px solid transparent}
+
+  /* principles */
+  .prow{position:absolute;left:80px;width:1120px;display:flex;gap:22px;align-items:baseline}
+  .prow .n{font-size:16px;font-weight:600;color:var(--blue-l);width:26px;flex:none}
+  .prow .p{font-size:27px;font-weight:600;color:var(--ink-l);line-height:1.25;letter-spacing:-.01em}
+  .prule{position:absolute;left:80px;width:1120px;height:1px;background:rgba(0,0,0,.1)}
+
+  /* device showcase */
+  .device{position:absolute;border-radius:20px;overflow:hidden;background:#000;box-shadow:0 30px 70px rgba(0,0,0,.4)}
+  .device img{width:100%;height:100%;object-fit:contain;background:#0d0d10;display:block}
+  .showcap{position:absolute;text-align:center}
+  .showcap .t{font-size:22px;font-weight:600}
+  .dark .showcap .t{color:var(--blue-d)} .light .showcap .t,.grey .showcap .t{color:var(--blue-l)}
+  .showcap .d{font-size:17px;color:var(--sub);margin-top:6px}
+  .spectrum{position:absolute;display:flex;align-items:center;gap:16px}
+  .spectrum .bar{flex:1;height:4px;border-radius:3px;background:linear-gradient(90deg,#E3C177,#a15ffb 55%,#ff5e8a)}
+  .spectrum .e{font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--sub)}
+  .quoteline{position:absolute;text-align:center;font-size:24px;font-weight:500;letter-spacing:-.01em}
+
+  /* placeholder */
+  .ph{position:absolute;left:80px;top:220px;right:80px;bottom:110px;border:2px dashed rgba(0,0,0,.14);
+    border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.015)}
+  .ph .big{font-size:28px;font-weight:600;color:#aeaeb2}
+  .ph .s{margin-top:10px;font-size:16px;color:#c7c7cc}
+  .ph .chip{margin-top:22px;font-size:13px;font-weight:600;color:var(--blue-l);border:1px solid var(--blue-l);padding:7px 16px;border-radius:980px}
+
+  /* rail */
+  #rail{position:fixed;left:0;top:0;bottom:0;width:var(--rail);z-index:70;background:#1c1c1e;border-right:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column}
+  #rail .rh{padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,.07);color:#8a8a8a;font-size:11px;font-weight:600;letter-spacing:.1em}
+  #rl{flex:1;overflow-y:auto;padding:12px;scrollbar-width:thin}
+  #rl::-webkit-scrollbar{width:7px} #rl::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:4px}
+  .thumb{position:relative;margin-bottom:14px;cursor:pointer;display:flex;gap:9px;align-items:flex-start}
+  .thumb .tn{font-size:11px;font-weight:600;color:#6f6f6f;width:16px;flex:none;text-align:right;padding-top:24px}
+  .thumb.current .tn{color:var(--blue-d)}
+  .thumb .fr{flex:1;position:relative;border-radius:6px;overflow:hidden;border:2px solid transparent;background:#000;aspect-ratio:16/9;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+  .thumb:hover .fr{border-color:rgba(255,255,255,.35)} .thumb.current .fr{border-color:var(--blue-d)}
+  .thumb .mini{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:top left;pointer-events:none}
+  .thumb .bdg{position:absolute;right:4px;top:4px;z-index:2;font-size:8px;font-weight:700;color:#fff;background:var(--blue-d);padding:1px 5px;border-radius:10px}
+  .thumb .bdg.wip{background:#8a8a8a}
+  #progress{position:fixed;left:var(--rail);right:0;top:0;height:3px;background:var(--blue-d);z-index:60;width:0;transition:width .3s}
+  #hud{position:fixed;left:var(--rail);right:0;bottom:0;height:46px;display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:0 18px;z-index:50;color:#8a8a8a;font-size:12px;pointer-events:none}
+  #hud .g{display:flex;align-items:center;gap:14px;pointer-events:auto}
+  #hud button{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#cfcfcf;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+  #hud button:hover{background:rgba(255,255,255,.16)}
+  #counter{color:#bdbdbd;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<aside id="rail"><div class="rh">SLIDES</div><div id="rl"></div></aside>
+<div id="stage">
+
+  <!-- 1 · TITLE (dark, centered hero) — GOAL + one line only -->
+  <section class="slide dark active">
+    <h1 class="hero" style="font-size:64px;white-space:nowrap;">Design the <span class="grad">best of the best</span> TGT.</h1>
+    <div class="pageno">00</div>
+  </section>
+
+  <!-- 4 · UX STRATEGY tiles (light) -->
+  <section class="slide light lslide">
+    <div class="head"><div class="eyebrow">UX Strategy</div><h2>Could we make it faster <span class="blue-l">without making it dumber?</span></h2></div>
+    <div class="grid8">
+      <div class="tile8"><div class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15-7l-3 3M9 14l-3 3m0-12l3 3m5 5l3 3" stroke="#B8863B" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="nm">Gesture</div><div class="ds">swipe & tap shortcuts</div></div></div>
+      <div class="tile8"><div class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="#B8863B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="nm">Fewer taps</div><div class="ds">shorter paths to done</div></div></div>
+      <div class="tile8"><div class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h10M4 18h6" stroke="#B8863B" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="nm">Info hierarchy</div><div class="ds">signal over noise</div></div></div>
+      <div class="tile8"><div class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke="#B8863B" stroke-width="1.5" stroke-linejoin="round"/></svg></div><div><div class="nm">Shortcut</div><div class="ds">power moves, one tap</div></div></div>
+      <div class="tile8"><div class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="#B8863B" stroke-width="1.5"/><path d="M12 2v3m0 14v3m10-10h-3M5 12H2m15.5-6.5l-2 2m-7 7l-2 2m11 0l-2-2m-7-7l-2-2" stroke="#B8863B" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="nm">Predictive prompts</div><div class="ds">the next move, offered</div></div></div>
+      <div class="tile8"><div class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 6.9H21l-5.5 4.1 2.1 6.9L12 15.7 6.4 20l2.1-6.9L3 9h6.6L12 2z" stroke="#B8863B" stroke-width="1.5" stroke-linejoin="round"/></svg></div><div><div class="nm">Gamification</div><div class="ds">progress you can feel</div></div></div>
+      <div class="tile8"><div class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="#B8863B" stroke-width="1.5" stroke-linejoin="round"/></svg></div><div><div class="nm">Engagement</div><div class="ds">stay in the loop</div></div></div>
+      <div class="tile8"><div class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M8 21h8m-4-4v4M7 4h10v5a5 5 0 01-10 0V4zM17 5h2a2 2 0 010 4h-1M7 5H5a2 2 0 000 4h1" stroke="#B8863B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="nm">Rewarding</div><div class="ds">good work, recognized</div></div></div>
+    </div>
+    <div class="pageno">04</div>
+  </section>
+
+  <!-- 5 · ceiling (dark statement) -->
+  <section class="slide dark">
+    <h1 class="big">But workflow optimization<br>has a <span class="grad-warm">ceiling</span>.</h1>
+    <div class="pageno">05</div>
+  </section>
+
+  <!-- 6b · FUTURE OPERATING MODEL timeline (grey) -->
+  <section class="slide grey lslide">
+    <div class="head"><div class="eyebrow">Product Evolution</div><h2 style="font-size:27px;white-space:nowrap;">The best TGT isn't a destination. It's a path to <span class="blue-l">autonomous operations</span>.</h2></div>
+    <div class="tl" style="left:110px;top:360px;width:1060px;"></div>
+    <div class="tlnode" style="left:180px;top:353px;"><div class="mk"></div><div class="t" style="bottom:26px;"><div class="n">Auto rating</div></div></div>
+    <div class="tlnode" style="left:345px;top:353px;"><div class="mk"></div><div class="t" style="top:26px;"><div class="n">Fill / credit prediction</div></div></div>
+    <div class="tlnode" style="left:520px;top:353px;"><div class="mk"></div><div class="t" style="bottom:26px;"><div class="n">AI floormap</div></div></div>
+    <div class="tlnode" style="left:695px;top:353px;"><div class="mk"></div><div class="t" style="top:26px;"><div class="n">Table projection</div><div class="s">swap / convert live</div></div></div>
+    <div class="tlnode" style="left:875px;top:353px;"><div class="mk"></div><div class="t" style="bottom:26px;"><div class="n">Portable Device</div></div></div>
+    <div class="tlnode end" style="left:1060px;top:352px;"><div class="mk"></div><div class="t" style="top:27px;"><div class="n">Autonomous</div><div class="s">manage by exception</div></div></div>
+    <div class="soc" style="left:110px;top:500px;width:1000px;"><span class="st">1:8</span><span class="ar"></span><span class="st last">1:MANY</span></div>
+    <div style="position:absolute;left:110px;top:562px;font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--sub);">SUPERVISOR : TABLES</div>
+    <div style="position:absolute;left:110px;top:562px;width:1000px;text-align:right;font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--sub);"><span style="color:var(--blue-l);font-weight:800;">SUPERVISOR</span> : TABLES</div>
+    <div class="pageno">07</div>
+  </section>
+
+  <!-- 7 · backwards (dark statement) -->
+  <section class="slide dark">
+    <h1 class="big">So I designed the <span class="grad">future first</span> —<br>then worked <span class="grad">backward</span> to today.</h1>
+    <div class="pageno">07</div>
+  </section>
+
+  <!-- 9 · HUB CONCEPT — two hand-drawn diagrams (black) -->
+  <section class="slide dark lslide" style="background:#000;">
+    <div class="head"><div class="eyebrow">Northstar Concept</div><h2 style="color:#f5f5f7;font-size:33px;">One hub. Every table. <span style="color:var(--blue-d)">Only what needs attention.</span></h2></div>
+
+    <!-- ============ DIAGRAM 1 (LEFT): FLOOR VIEW — many tables, attention/action still at left ============ -->
+    <svg viewBox="0 0 420 380" style="position:absolute;left:36px;top:210px;width:384px;height:352px;overflow:visible;">
+      <!-- outer device frame -->
+      <rect x="10" y="14" width="400" height="352" rx="16" stroke="#F5F5F7" stroke-width="2.4" fill="none"/>
+      <!-- TOP BAR -->
+      <rect x="28" y="32" width="26" height="22" rx="5" stroke="#E3C177" stroke-width="1.8" fill="none"/>
+      <line x1="70" y1="43" x2="160" y2="43" stroke="#E3C177" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="368" cy="43" r="8" stroke="#E3C177" stroke-width="1.8" fill="none"/>
+      <!-- LEFT PANEL divider (attention/action rail) -->
+      <path d="M150 70 C 146 180, 154 300, 150 356" stroke="#F5F5F7" stroke-width="2"/>
+      <!-- left panel: attention/action rows -->
+      <rect x="26" y="86" width="110" height="34" rx="6" stroke="#F5F5F7" stroke-width="1.7" fill="rgba(227,193,119,.10)"/>
+      <line x1="36" y1="98" x2="120" y2="98" stroke="#F5F5F7" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="36" y1="108" x2="96" y2="108" stroke="#9a9a9a" stroke-width="1.2" stroke-linecap="round"/>
+      <rect x="26" y="130" width="110" height="34" rx="6" stroke="#9a9a9a" stroke-width="1.5" fill="none"/>
+      <line x1="36" y1="142" x2="120" y2="142" stroke="#9a9a9a" stroke-width="1.2" stroke-linecap="round"/>
+      <rect x="26" y="174" width="110" height="34" rx="6" stroke="#9a9a9a" stroke-width="1.5" fill="none"/>
+      <line x1="36" y1="186" x2="120" y2="186" stroke="#9a9a9a" stroke-width="1.2" stroke-linecap="round"/>
+      <rect x="26" y="218" width="110" height="34" rx="6" stroke="#9a9a9a" stroke-width="1.5" fill="none"/>
+      <line x1="36" y1="230" x2="120" y2="230" stroke="#9a9a9a" stroke-width="1.2" stroke-linecap="round"/>
+      <!-- RIGHT: a GRID of many small baccarat tables (floor view) -->
+      <!-- row 1 -->
+      <path d="M186 96 q 26 -13 52 0 q 26 13 0 26 q -26 13 -52 0 q -26 -13 0 -26 Z" stroke="#9a9a9a" stroke-width="1.5" fill="none"/>
+      <path d="M266 96 q 26 -13 52 0 q 26 13 0 26 q -26 13 -52 0 q -26 -13 0 -26 Z" stroke="#E3C177" stroke-width="1.7" fill="rgba(227,193,119,.10)"/>
+      <path d="M346 96 q 26 -13 52 0 q 26 13 0 26 q -26 13 -52 0 q -26 -13 0 -26 Z" stroke="#9a9a9a" stroke-width="1.5" fill="none" transform="translate(-14,0)"/>
+      <!-- row 2 -->
+      <path d="M186 158 q 26 -13 52 0 q 26 13 0 26 q -26 13 -52 0 q -26 -13 0 -26 Z" stroke="#9a9a9a" stroke-width="1.5" fill="none"/>
+      <path d="M266 158 q 26 -13 52 0 q 26 13 0 26 q -26 13 -52 0 q -26 -13 0 -26 Z" stroke="#9a9a9a" stroke-width="1.5" fill="none"/>
+      <path d="M346 158 q 26 -13 52 0 q 26 13 0 26 q -26 13 -52 0 q -26 -13 0 -26 Z" stroke="#9a9a9a" stroke-width="1.5" fill="none" transform="translate(-14,0)"/>
+      <!-- row 3 -->
+      <path d="M186 220 q 26 -13 52 0 q 26 13 0 26 q -26 13 -52 0 q -26 -13 0 -26 Z" stroke="#9a9a9a" stroke-width="1.5" fill="none"/>
+      <path d="M266 220 q 26 -13 52 0 q 26 13 0 26 q -26 13 -52 0 q -26 -13 0 -26 Z" stroke="#9a9a9a" stroke-width="1.5" fill="none"/>
+      <path d="M346 220 q 26 -13 52 0 q 26 13 0 26 q -26 13 -52 0 q -26 -13 0 -26 Z" stroke="#9a9a9a" stroke-width="1.5" fill="none" transform="translate(-14,0)"/>
+      <!-- labels -->
+      <text x="82" y="300" text-anchor="middle" font-size="13" font-weight="700" fill="#E3C177" font-family="-apple-system,sans-serif">Attention · Action</text>
+      <text x="292" y="300" text-anchor="middle" font-size="13" font-weight="700" fill="#9a9a9a" font-family="-apple-system,sans-serif">Every table</text>
+    </svg>
+    <div style="position:absolute;left:42px;top:174px;width:380px;font-size:13px;font-weight:400;color:#9a9a9a;">Zoom out — the whole floor at a glance, flagged tables surfaced first.</div>
+    <div style="position:absolute;left:228px;top:596px;font-size:15px;font-weight:600;color:#E3C177;transform:translateX(-50%);text-align:center;">Floor View</div>
+
+    <!-- ============ DIAGRAM 2 (MIDDLE): HUB LAYOUT — single table, attention/action at left ============ -->
+    <svg viewBox="0 0 420 380" style="position:absolute;left:448px;top:210px;width:384px;height:352px;overflow:visible;">
+      <rect x="10" y="14" width="400" height="352" rx="16" stroke="#F5F5F7" stroke-width="2.4" fill="none"/>
+      <!-- TOP BAR -->
+      <rect x="28" y="32" width="26" height="22" rx="5" stroke="#E3C177" stroke-width="1.8" fill="none"/>
+      <line x1="70" y1="43" x2="160" y2="43" stroke="#E3C177" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="352" cy="43" r="8" stroke="#E3C177" stroke-width="1.8" fill="none"/>
+      <circle cx="380" cy="43" r="8" stroke="#E3C177" stroke-width="1.8" fill="none"/>
+      <!-- LEFT PANEL divider -->
+      <path d="M150 70 C 146 180, 154 300, 150 356" stroke="#F5F5F7" stroke-width="2"/>
+      <!-- left panel content (attention rows) -->
+      <rect x="26" y="86" width="110" height="36" rx="6" stroke="#F5F5F7" stroke-width="1.7" fill="rgba(227,193,119,.10)"/>
+      <line x1="36" y1="99" x2="120" y2="99" stroke="#F5F5F7" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="36" y1="110" x2="96" y2="110" stroke="#9a9a9a" stroke-width="1.2" stroke-linecap="round"/>
+      <rect x="26" y="132" width="110" height="36" rx="6" stroke="#9a9a9a" stroke-width="1.5" fill="none"/>
+      <line x1="36" y1="145" x2="120" y2="145" stroke="#9a9a9a" stroke-width="1.2" stroke-linecap="round"/>
+      <rect x="26" y="178" width="110" height="36" rx="6" stroke="#9a9a9a" stroke-width="1.5" fill="none"/>
+      <line x1="36" y1="191" x2="120" y2="191" stroke="#9a9a9a" stroke-width="1.2" stroke-linecap="round"/>
+      <!-- ONE big baccarat table (single-table detail viewport) -->
+      <path d="M200 150 q 60 -30 120 0 q 34 20 0 40 q -60 30 -120 0 q -34 -20 0 -40 Z" stroke="#9a9a9a" stroke-width="1.8" fill="none"/>
+      <circle cx="260" cy="192" r="20" stroke="#9a9a9a" stroke-width="1.6" fill="none"/>
+      <!-- seat marks around it -->
+      <circle cx="200" cy="150" r="7" stroke="#9a9a9a" stroke-width="1.4" fill="none"/>
+      <circle cx="320" cy="150" r="7" stroke="#9a9a9a" stroke-width="1.4" fill="none"/>
+      <circle cx="200" cy="230" r="7" stroke="#9a9a9a" stroke-width="1.4" fill="none"/>
+      <circle cx="320" cy="230" r="7" stroke="#9a9a9a" stroke-width="1.4" fill="none"/>
+      <text x="82" y="300" text-anchor="middle" font-size="13" font-weight="700" fill="#E3C177" font-family="-apple-system,sans-serif">Attention · Action</text>
+      <text x="288" y="300" text-anchor="middle" font-size="13" font-weight="700" fill="#9a9a9a" font-family="-apple-system,sans-serif">One table</text>
+    </svg>
+    <div style="position:absolute;left:454px;top:174px;width:380px;font-size:13px;font-weight:400;color:#9a9a9a;">Zoom in — one table in full, the review queue still leads.</div>
+    <div style="position:absolute;left:640px;top:596px;font-size:15px;font-weight:600;color:#E3C177;transform:translateX(-50%);text-align:center;">Hub Layout</div>
+
+    <!-- ============ DIAGRAM 3 (RIGHT): HUB INTERACTION FLOW — hub → branch → return ============ -->
+    <svg viewBox="0 0 420 380" style="position:absolute;left:860px;top:210px;width:384px;height:352px;overflow:visible;">
+      <!-- 4 task nodes around the hub -->
+      <circle cx="90"  cy="80"  r="26" stroke="#9a9a9a" stroke-width="2" fill="none"/>
+      <circle cx="330" cy="80"  r="26" stroke="#9a9a9a" stroke-width="2" fill="none"/>
+      <circle cx="90"  cy="280" r="26" stroke="#9a9a9a" stroke-width="2" fill="none"/>
+      <circle cx="330" cy="280" r="26" stroke="#9a9a9a" stroke-width="2" fill="none"/>
+      <!-- central HUB (gold double ring) -->
+      <circle cx="210" cy="180" r="42" fill="rgba(227,193,119,.14)" stroke="#E3C177" stroke-width="2.6"/>
+      <path d="M210 144 a 48 48 0 1 1 -1 0" stroke="#E3C177" stroke-width="1.4" fill="none" stroke-dasharray="4 6" opacity=".7"/>
+      <!-- OUT arrows (gold) -->
+      <path d="M180 152 C 148 122, 120 106, 104 100" stroke="#E3C177" stroke-width="2.1" fill="none"/>
+      <path d="M104 100 l 11 -1 M104 100 l 3 10" stroke="#E3C177" stroke-width="2.1" stroke-linecap="round"/>
+      <path d="M240 152 C 272 122, 300 106, 316 100" stroke="#E3C177" stroke-width="2.1" fill="none"/>
+      <path d="M316 100 l -11 -1 M316 100 l -3 10" stroke="#E3C177" stroke-width="2.1" stroke-linecap="round"/>
+      <!-- RETURN arrows (white) -->
+      <path d="M112 262 C 138 240, 172 216, 194 204" stroke="#F5F5F7" stroke-width="1.9" fill="none"/>
+      <path d="M194 204 l -11 0 M194 204 l -1 11" stroke="#F5F5F7" stroke-width="1.9" stroke-linecap="round"/>
+      <path d="M308 262 C 282 240, 248 216, 226 204" stroke="#F5F5F7" stroke-width="1.9" fill="none"/>
+      <path d="M226 204 l 11 0 M226 204 l 1 11" stroke="#F5F5F7" stroke-width="1.9" stroke-linecap="round"/>
+      <text x="210" y="186" text-anchor="middle" font-size="17" font-weight="700" fill="#E3C177" font-family="-apple-system,sans-serif">HUB</text>
+    </svg>
+    <div style="position:absolute;left:1052px;top:174px;width:380px;font-size:13px;font-weight:400;color:#9a9a9a;transform:translateX(-50%);text-align:center;">Every task starts at the hub, branches out, and returns.</div>
+    <div style="position:absolute;left:1052px;top:596px;font-size:15px;font-weight:600;color:#E3C177;transform:translateX(-50%);text-align:center;">Hub Interaction Flow</div>
+
+    <div class="pageno">09</div>
+  </section>
+
+  <!-- 10 · BOH APP — shown on a large monitor (command center) -->
+  <section class="slide" style="background:radial-gradient(ellipse at center,#161618,#000 72%);padding:0;">
+    <div class="monitor" style="position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:1100px;height:632px;">
+      <div class="screen" style="width:1072px;height:604px;">
+        <iframe data-src="pit12-interactive.html" scrolling="no" style="width:1072px;height:604px;"></iframe>
+      </div>
+      <div class="monitor-stand"></div>
+      <div class="monitor-base"></div>
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:26px;text-align:center;font-size:15px;color:#9a9a9a;">BOH Command Center · the whole pit on one screen</div>
+  </section>
+
+  <!-- 11 · PORTABLE DEVICE — held in hand (1024×768 → 4:3 tablet) -->
+  <section class="slide" style="background:radial-gradient(ellipse at center,#161618,#000 72%);padding:0;">
+    <!-- 4:3 screen so the 1024×768 UI fills the full width, no gaps -->
+    <div class="device-chassis" style="position:absolute;left:calc(50% - 10px);top:52px;transform:translateX(-50%);width:800px;height:614px;">
+      <div class="device-cam"></div>
+      <div class="device-screen" style="width:768px;height:582px;">
+        <iframe data-src="tgt-ipad-1024.html" scrolling="no" style="width:768px;height:582px;"></iframe>
+      </div>
+    </div>
+    <!-- hand holding the tablet from the LEFT side (thumb on front, fingers behind) -->
+    <svg viewBox="0 0 260 460" style="position:absolute;left:110px;top:300px;width:300px;height:530px;overflow:visible;z-index:5;">
+      <!-- forearm / wrist entering from lower-left -->
+      <path d="M4 452 C 40 420, 60 380, 74 340 C 84 312, 92 288, 108 268"
+            fill="#141413" stroke="none"/>
+      <path d="M4 452 C 40 420, 60 380, 74 340 C 84 312, 92 288, 108 268"
+            stroke="#E3C177" stroke-width="2.6" fill="none"/>
+      <path d="M92 452 C 120 410, 132 372, 140 338"
+            stroke="#E3C177" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <!-- palm: rounded mass gripping the tablet's left edge -->
+      <path d="M108 268
+               C 96 240, 100 208, 124 194
+               C 148 180, 178 188, 192 210
+               C 200 224, 202 242, 206 258
+               C 212 284, 214 312, 200 336
+               C 186 360, 156 366, 130 356
+               C 116 350, 106 336, 100 320
+               C 96 302, 100 284, 108 268 Z"
+            fill="#141413" stroke="#E3C177" stroke-width="2.6" stroke-linejoin="round"/>
+      <!-- THUMB reaching up onto the FRONT bezel (points right, over the screen edge) -->
+      <path d="M196 214
+               C 218 196, 246 190, 264 200
+               C 276 207, 278 222, 268 234
+               C 258 246, 236 248, 216 242
+               C 206 239, 200 230, 198 222 Z"
+            fill="#141413" stroke="#E3C177" stroke-width="2.6" stroke-linejoin="round"/>
+      <!-- knuckle / finger creases on the palm -->
+      <path d="M138 226 q 26 -4 44 8 M132 258 q 30 -2 52 12 M132 290 q 28 0 50 12"
+            stroke="#E3C177" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".65"/>
+    </svg>
+    <div style="position:absolute;left:0;right:0;bottom:30px;text-align:center;font-size:15px;color:#9a9a9a;">Portable Device · live table intelligence in the hand</div>
+  </section>
+
+  <!-- 11b · UX STRATEGY — work-backwards analysis (light, hand-drawn) -->
+  <section class="slide light lslide">
+    <svg width="0" height="0" style="position:absolute"><filter id="wobble2"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2"/></filter></svg>
+    <div class="head"><div class="eyebrow">UX Strategy</div><h2 style="font-size:34px;">From a <span style="color:var(--ink-l)">system of record</span>, to a <span class="blue-l">system of attention</span>.</h2></div>
+    <div style="position:absolute;left:0;right:0;top:200px;bottom:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;">
+      <!-- NORTH STAR card -->
+      <div style="width:660px;border:2px solid #B8863B;border-radius:20px;padding:22px 30px;text-align:center;background:rgba(184,134,59,.05);">
+        <div style="font-size:13px;font-weight:800;letter-spacing:.18em;color:var(--blue-l);">★ NORTH STAR</div>
+        <div style="margin-top:10px;font-size:26px;font-weight:800;color:var(--ink-l);letter-spacing:-.01em;">Autonomous · Attention-driven · One hub · 0:ALL</div>
+      </div>
+      <!-- Work Backwards arrow -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:14px 0;">
+        <svg width="30" height="54" viewBox="0 0 30 54" fill="none" style="filter:url(#wobble2);"><path d="M15 2 C 13 18, 17 32, 15 44" stroke="#B8863B" stroke-width="2.4" stroke-linecap="round"/><path d="M7 38 L15 50 L23 38" stroke="#B8863B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        <div style="margin-top:2px;font-size:15px;font-weight:800;letter-spacing:.06em;color:var(--sub);">WORK BACKWARDS</div>
+      </div>
+      <!-- TODAY card -->
+      <div style="width:660px;border:1.5px solid rgba(0,0,0,.14);border-radius:20px;padding:22px 30px;text-align:center;background:var(--grey-bg);">
+        <div style="font-size:13px;font-weight:800;letter-spacing:.18em;color:var(--sub);">TODAY</div>
+        <div style="margin-top:10px;font-size:24px;font-weight:800;color:var(--ink-l);letter-spacing:-.01em;">Faster · Glanceable · Exception-aware · Automation-ready</div>
+      </div>
+    </div>
+    <div class="pageno">11</div>
+  </section>
+
+  <!-- 12 · UX PRINCIPLES (light) -->
+  <section class="slide light lslide">
+    <div class="head"><div class="eyebrow">UX Principles</div><h2 style="font-size:38px;">Fast Interaction, <span class="blue-l">Better Awareness</span>.</h2></div>
+    <div class="prule" style="top:200px;"></div>
+    <div class="prow" style="top:216px;"><div class="n">1</div><div class="p">The system must provide strong situational awareness.</div></div>
+    <div class="prule" style="top:288px;"></div>
+    <div class="prow" style="top:304px;"><div class="n">2</div><div class="p">Elevate the exception.</div></div>
+    <div class="prule" style="top:376px;"></div>
+    <div class="prow" style="top:392px;"><div class="n">3</div><div class="p">Enable action in-context.</div></div>
+    <div class="prule" style="top:464px;"></div>
+    <div class="prow" style="top:480px;"><div class="n">4</div><div class="p">Let automation grow without changing the interaction model.</div></div>
+    <div class="prule" style="top:552px;"></div>
+    <div class="prow" style="top:568px;"><div class="n">5</div><div class="p">Never bottleneck the operation's evolution.</div></div>
+    <div class="prule" style="top:640px;"></div>
+    <div class="pageno">12</div>
+  </section>
+
+  <!-- 12 · UX STRATEGY — two hand-drawn diagrams (screen layout + hub concept), slide-08 style -->
+  <section class="slide dark lslide" style="background:#000;">
+    <div class="head"><div class="eyebrow">Current Concept</div><h2 style="color:#f5f5f7;font-size:30px;line-height:1.2;">The first step toward the <span style="color:var(--blue-d)">North Star</span>.</h2></div>
+
+    <!-- LEFT: hand-drawn screen layout — TOP Attention / MIDDLE Viewport / BOTTOM Action -->
+    <svg viewBox="0 0 560 380" style="position:absolute;left:60px;top:210px;width:540px;height:356px;overflow:visible;">
+      <!-- outer device frame -->
+      <rect x="14" y="14" width="532" height="352" rx="18" stroke="#F5F5F7" stroke-width="2.4" fill="none"/>
+      <!-- horizontal band dividers -->
+      <path d="M20 116 C 180 112, 380 120, 540 115" stroke="#F5F5F7" stroke-width="2" opacity=".8"/>
+      <path d="M20 264 C 180 260, 380 268, 540 263" stroke="#F5F5F7" stroke-width="2" opacity=".8"/>
+      <!-- TOP band: attention cards (gold-tinted) -->
+      <rect x="34" y="42" width="150" height="54" rx="8" stroke="#E3C177" stroke-width="1.8" fill="rgba(227,193,119,.12)"/>
+      <rect x="204" y="42" width="150" height="54" rx="8" stroke="#9a9a9a" stroke-width="1.6" fill="none"/>
+      <rect x="374" y="42" width="150" height="54" rx="8" stroke="#9a9a9a" stroke-width="1.6" fill="none"/>
+      <!-- MIDDLE band: viewport sketch (table oval) -->
+      <path d="M150 168 q 130 -34 260 0 q 40 22 0 44 q -130 34 -260 0 q -40 -22 0 -44 Z" stroke="#9a9a9a" stroke-width="1.8" fill="none"/>
+      <circle cx="280" cy="210" r="20" stroke="#9a9a9a" stroke-width="1.6" fill="none"/>
+      <!-- BOTTOM band: action buttons row -->
+      <rect x="34" y="290" width="58" height="52" rx="8" stroke="#E3C177" stroke-width="1.8" fill="none"/>
+      <rect x="104" y="290" width="58" height="52" rx="8" stroke="#9a9a9a" stroke-width="1.6" fill="none"/>
+      <rect x="174" y="290" width="58" height="52" rx="8" stroke="#9a9a9a" stroke-width="1.6" fill="none"/>
+      <rect x="244" y="290" width="58" height="52" rx="8" stroke="#9a9a9a" stroke-width="1.6" fill="none"/>
+      <rect x="314" y="290" width="58" height="52" rx="8" stroke="#9a9a9a" stroke-width="1.6" fill="none"/>
+      <rect x="384" y="290" width="58" height="52" rx="8" stroke="#9a9a9a" stroke-width="1.6" fill="none"/>
+      <rect x="454" y="290" width="58" height="52" rx="8" stroke="#9a9a9a" stroke-width="1.6" fill="none"/>
+      <!-- zone labels -->
+      <text x="474" y="34" font-size="13" font-weight="700" fill="#E3C177" font-family="-apple-system,sans-serif" text-anchor="end">Attention</text>
+      <text x="474" y="160" font-size="13" font-weight="700" fill="#9a9a9a" font-family="-apple-system,sans-serif" text-anchor="end">Viewport</text>
+      <text x="474" y="282" font-size="13" font-weight="700" fill="#E3C177" font-family="-apple-system,sans-serif" text-anchor="end">Action</text>
+    </svg>
+    <div style="position:absolute;left:80px;top:172px;width:540px;font-size:14px;font-weight:400;color:#9a9a9a;">One screen, three jobs — attention up top, the floor in the middle, action at the bottom.</div>
+    <div style="position:absolute;left:330px;top:592px;font-size:15px;font-weight:600;color:#E3C177;transform:translateX(-50%);text-align:center;">Hub Layout</div>
+
+    <!-- RIGHT: hub concept (same as slide 08) -->
+    <svg viewBox="0 0 540 380" style="position:absolute;left:680px;top:220px;width:520px;height:356px;overflow:visible;">
+      <circle cx="120" cy="90"  r="30" stroke="#9a9a9a" stroke-width="2" fill="none"/>
+      <circle cx="420" cy="90"  r="30" stroke="#9a9a9a" stroke-width="2" fill="none"/>
+      <circle cx="120" cy="290" r="30" stroke="#9a9a9a" stroke-width="2" fill="none"/>
+      <circle cx="420" cy="290" r="30" stroke="#9a9a9a" stroke-width="2" fill="none"/>
+      <circle cx="270" cy="190" r="46" fill="rgba(227,193,119,.14)" stroke="#E3C177" stroke-width="2.6"/>
+      <path d="M270 152 a 52 52 0 1 1 -1 0" stroke="#E3C177" stroke-width="1.4" fill="none" stroke-dasharray="4 6" opacity=".7"/>
+      <path d="M236 162 C 200 130, 168 112, 146 108" stroke="#E3C177" stroke-width="2.2" fill="none"/>
+      <path d="M146 108 l 12 -1 M146 108 l 3 11" stroke="#E3C177" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M304 162 C 340 130, 372 112, 394 108" stroke="#E3C177" stroke-width="2.2" fill="none"/>
+      <path d="M394 108 l -12 -1 M394 108 l -3 11" stroke="#E3C177" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M150 274 C 176 250, 210 226, 232 214" stroke="#F5F5F7" stroke-width="2" fill="none"/>
+      <path d="M232 214 l -12 0 M232 214 l -1 12" stroke="#F5F5F7" stroke-width="2" stroke-linecap="round"/>
+      <path d="M390 274 C 364 250, 330 226, 308 214" stroke="#F5F5F7" stroke-width="2" fill="none"/>
+      <path d="M308 214 l 12 0 M308 214 l 1 12" stroke="#F5F5F7" stroke-width="2" stroke-linecap="round"/>
+      <text x="270" y="196" text-anchor="middle" font-size="18" font-weight="700" fill="#E3C177" font-family="-apple-system,sans-serif">HUB</text>
+    </svg>
+    <div style="position:absolute;left:940px;top:172px;width:520px;font-size:14px;font-weight:400;color:#9a9a9a;transform:translateX(-50%);text-align:center;">Every interaction starts at the hub, branches out to a task, and returns.</div>
+    <div style="position:absolute;left:940px;top:592px;font-size:15px;font-weight:600;color:#E3C177;transform:translateX(-50%);text-align:center;">Hub Interaction Flow</div>
+
+    <div class="pageno">13</div>
+  </section>
+
+
+  <!-- 14 · LIVE CONCEPT TABLE — the real dark table view on a large touchscreen, standing on a sketched baccarat felt -->
+  <section class="slide" style="padding:0;overflow:hidden;background:radial-gradient(ellipse 80% 90% at 50% 26%, #241826 0%, #150e1a 50%, #090509 100%);">
+
+    <!-- HAND-DRAWN baccarat table + chips (sketch line art; turbulence filter gives the wobble) -->
+    <svg viewBox="0 0 1280 300" style="position:absolute;left:0;right:0;bottom:0;width:1280px;height:300px;overflow:visible;">
+      <defs>
+        <filter id="sketch14" x="-5%" y="-5%" width="110%" height="110%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/>
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="4.5" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+      <g filter="url(#sketch14)">
+        <!-- table edge (curved, sketchy double stroke in gold) -->
+        <path d="M-40 150 C 240 70, 520 56, 640 56 C 760 56, 1040 70, 1320 150" stroke="#E3C177" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-36 160 C 244 82, 516 68, 640 69 C 764 68, 1036 82, 1316 160" stroke="#E3C177" stroke-width="1.4" fill="none" opacity=".45" stroke-linecap="round"/>
+        <!-- inner betting arc (white hand-drawn) -->
+        <path d="M150 210 C 360 150, 540 138, 640 138 C 740 138, 920 150, 1130 210" stroke="#F5F5F7" stroke-width="1.8" fill="none" opacity=".5" stroke-linecap="round"/>
+        <!-- CHIP STACKS -->
+        <g stroke="#E85A6B" stroke-width="2.4" fill="none" stroke-linecap="round">
+          <path d="M296 196 q 34 -16 68 0 q -34 16 -68 0 Z"/>
+          <path d="M296 184 q 34 -16 68 0 q -34 16 -68 0 Z"/>
+          <path d="M296 172 q 34 -16 68 0 q -34 16 -68 0 Z"/>
+          <path d="M296 160 q 34 -16 68 0 q -34 16 -68 0 Z"/>
+          <path d="M296 160 v 36 M364 160 v 36"/>
+        </g>
+        <g stroke="#E3C177" stroke-width="2.4" fill="none" stroke-linecap="round">
+          <path d="M406 212 q 34 -16 68 0 q -34 16 -68 0 Z"/>
+          <path d="M406 200 q 34 -16 68 0 q -34 16 -68 0 Z"/>
+          <path d="M406 188 q 34 -16 68 0 q -34 16 -68 0 Z"/>
+          <path d="M406 188 v 24 M474 188 v 24"/>
+        </g>
+        <g stroke="#F5F5F7" stroke-width="2.4" fill="none" stroke-linecap="round">
+          <path d="M846 204 q 34 -16 68 0 q -34 16 -68 0 Z"/>
+          <path d="M846 192 q 34 -16 68 0 q -34 16 -68 0 Z"/>
+          <path d="M846 180 q 34 -16 68 0 q -34 16 -68 0 Z"/>
+          <path d="M846 168 q 34 -16 68 0 q -34 16 -68 0 Z"/>
+          <path d="M846 156 q 34 -16 68 0 q -34 16 -68 0 Z"/>
+          <path d="M846 156 v 48 M914 156 v 48"/>
+        </g>
+        <path d="M950 214 q 30 -15 60 0 q -30 15 -60 0 Z" stroke="#E85A6B" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <path d="M530 230 q 30 -15 60 0 q -30 15 -60 0 Z" stroke="#E3C177" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- labels stay crisp (outside the wobble filter) -->
+      <text x="360" y="130" font-size="17" font-weight="700" fill="#9a9a9a" font-family="-apple-system,sans-serif" letter-spacing="2">PLAYER</text>
+      <text x="920" y="130" font-size="17" font-weight="700" fill="#9a9a9a" font-family="-apple-system,sans-serif" letter-spacing="2">BANKER</text>
+      <text x="620" y="118" font-size="15" font-weight="700" fill="#E3C177" font-family="-apple-system,sans-serif" letter-spacing="2">TIE</text>
+    </svg>
+
+    <!-- soft contact shadow under the device base -->
+    <div style="position:absolute;left:50%;bottom:60px;transform:translateX(-50%);width:640px;height:40px;
+      background:radial-gradient(ellipse,rgba(0,0,0,.6),transparent 70%);z-index:1;"></div>
+
+    <!-- chassis wrapping the live 1024×768 concept table, sitting above the felt -->
+    <div class="device-chassis" style="position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);padding:14px;border-radius:22px;z-index:2;">
+      <div class="device-cam"></div>
+      <!-- 1024×768 UI scaled by 0.83 → 850×637 screen (smaller so the felt+chips band shows below) -->
+      <div class="device-screen" style="width:850px;height:637px;border-radius:12px;">
+        <iframe data-src="concept-table-dark.html" scrolling="no"
+          style="width:1024px;height:768px;transform:scale(0.83);transform-origin:top left;"></iframe>
+      </div>
+    </div>
+    <div class="pageno">14</div>
+  </section>
+
+</div>
+
+<div id="hud"><div class="g"><button id="prev">‹</button><span id="counter">1 / 16</span><button id="next">›</button><button id="fs">⛶</button></div></div>
+
+<script>
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var stage=document.getElementById('stage'), idx=0;
+  slides.forEach(function(s,i){var p=s.querySelector('.pageno');if(p)p.textContent=('0'+(i+1)).slice(-2);});
+  function scale(){var r=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--rail'))||0;
+    stage.style.transform='scale('+Math.min((innerWidth-r-32)/1280,(innerHeight-52)/720)+')';}
+  addEventListener('resize',scale);scale();
+  var BADGE={8:'LIVE',9:'LIVE',13:'LIVE'},thumbs=[];
+  (function(){var list=document.getElementById('rl');
+    slides.forEach(function(s,i){var th=document.createElement('div');th.className='thumb';
+      var n=document.createElement('span');n.className='tn';n.textContent=('0'+(i+1)).slice(-2);
+      var fr=document.createElement('div');fr.className='fr';var mi=document.createElement('div');mi.className='mini';
+      var cl=s.cloneNode(true);cl.classList.remove('active');cl.style.opacity='1';cl.style.visibility='visible';cl.style.transition='none';
+      cl.querySelectorAll('iframe').forEach(function(f){var ph=document.createElement('div');ph.style.cssText='position:absolute;inset:0;background:#1b1b1f;display:flex;align-items:center;justify-content:center;color:#9a9a9a;font-size:34px;font-weight:700;';ph.textContent='◱ LIVE UI';f.parentNode.replaceChild(ph,f);});
+      mi.appendChild(cl);fr.appendChild(mi);
+      if(BADGE[i]){var b=document.createElement('span');b.className='bdg'+(BADGE[i]==='WIP'?' wip':'');b.textContent=BADGE[i];fr.appendChild(b);}
+      th.appendChild(n);th.appendChild(fr);th.onclick=function(){show(i);};list.appendChild(th);thumbs.push(th);});
+    scaleThumbs();})();
+  function scaleThumbs(){thumbs.forEach(function(t){var fr=t.querySelector('.fr'),mi=t.querySelector('.mini');mi.style.transform='scale('+(fr.clientWidth/1280)+')';});}
+  addEventListener('resize',scaleThumbs);
+  function syncRail(){thumbs.forEach(function(t,i){t.classList.toggle('current',i===idx);});var c=thumbs[idx];if(c)c.scrollIntoView({block:'nearest',behavior:'smooth'});}
+  function show(n){n=Math.max(0,Math.min(slides.length-1,n));slides[idx].classList.remove('active');idx=n;slides[idx].classList.add('active');
+    slides[idx].querySelectorAll('iframe[data-src]').forEach(function(f){if(!f.src)f.src=f.getAttribute('data-src');});
+    document.getElementById('counter').textContent=(idx+1)+' / '+slides.length;
+    document.getElementById('progress').style.width=(idx/(slides.length-1)*100)+'%';syncRail();}
+  document.getElementById('next').onclick=function(){show(idx+1);};document.getElementById('prev').onclick=function(){show(idx-1);};
+  document.getElementById('fs').onclick=function(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();};
+  addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '||e.key==='PageDown'){e.preventDefault();show(idx+1);}else if(e.key==='ArrowLeft'||e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();show(idx-1);}else if(e.key==='Home')show(0);else if(e.key==='End')show(slides.length-1);else if(e.key==='f'||e.key==='F')document.getElementById('fs').click();});
+  stage.addEventListener('click',function(e){if(e.target.closest('.embed-frame'))return;show(idx+1);});
+  show(0);
+</script>
+</body>
+</html>

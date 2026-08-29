@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept TGT · Transaction Log — MD88012</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Open+Sans:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Concept TGT — Transaction Log  1024×768
+   Ledger list (Figma 2058:144526) + tap-row detail overlay
+   (switch selection · double-tap to expand · ✕ to close).
+   ============================================================ */
+:root{
+  --canvas:#0e0b09; --raised:rgba(255,255,255,.05); --card:rgba(14,12,9,.85);
+  --panel:rgba(8,6,5,.94); --glass:rgba(255,255,255,.1);
+  --primary:#f3efe6; --secondary:#a79f92; --muted:#7a736a; --accent:#ebcf8b;
+  --positive:#58d97a; --negative:#e85a6b; --info:#5aa8e8; --purple:#c79bf2; --gold:#cea02c; --n09:#fdfdfd;
+  --e1:0 2px 4px rgba(0,0,0,.1); --e2:0 4px 12px rgba(0,0,0,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{width:100vw;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:#000;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--primary)}
+.ui-root{position:relative;width:1024px;height:768px;overflow:hidden;background:var(--canvas)}
+img.i{display:block;width:100%;height:100%}
+
+/* ---------- GLOBAL BAR ---------- */
+#gbar{position:absolute;left:0;top:0;width:1024px;height:64px;background:var(--panel);
+  display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:30}
+.gbar-l{display:flex;align-items:center;gap:12px}
+.iconbtn{background:var(--raised);border:1px solid var(--glass);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:var(--e2)}
+.iconbtn.sq{width:48px;height:48px}.iconbtn.sq .g{width:19px;height:19px}
+.tid{background:var(--raised);border:1px solid var(--glass);border-radius:16px;height:48px;display:flex;align-items:center;gap:4px;padding:0 12px;box-shadow:var(--e1)}
+.tid .dot{width:8px;height:8px;border-radius:50%;background:var(--positive)}
+.tid .nm{font-weight:800;font-size:18px;color:var(--primary)}
+.warnbtn{padding:12px;border-radius:16px;display:flex;align-items:center}.warnbtn .g{width:24px;height:24px}
+.gbar-r{display:flex;align-items:center;gap:12px;justify-content:flex-end}
+.gbar-r .g24box{width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.gbar-r .g16{width:16px;height:16px}
+.pillbtn .gmoney{width:15px;height:15px;object-fit:contain}
+.datetxt{font-weight:600;font-size:16px;color:var(--primary);white-space:nowrap}
+.datetxt.mono{white-space:pre}
+.pillbtn{background:var(--raised);border:1px solid var(--glass);border-radius:16px;display:flex;align-items:center;gap:12px;padding:12px;box-shadow:var(--e2)}
+.pillbtn .g24{width:24px;height:24px}.pillbtn .t{font-weight:700;font-size:16px;color:var(--primary);white-space:nowrap}
+.badgebtn{position:relative}
+.badge{position:absolute;left:26px;top:3px;min-width:18px;height:18px;padding:0 4px;border-radius:43px;background:var(--negative);
+  display:flex;align-items:center;justify-content:center;font-family:'Open Sans';font-weight:700;font-size:12px;line-height:1;color:var(--n09)}
+
+/* ---------- BREADCRUMB + SEGMENT CONTROLS ---------- */
+#crumb{position:absolute;left:12px;top:64px;height:19px;z-index:5;font-weight:800;font-size:15px;letter-spacing:.5px;color:var(--muted);text-transform:uppercase}
+#seg{position:absolute;left:12px;top:84px;height:56px;z-index:5;display:flex;gap:15px;align-items:center}
+.segbox{background:var(--raised);border-radius:16px;padding:4px;display:flex;gap:4px;align-items:center;box-shadow:var(--e2);height:56px}
+.segtab{height:100%;min-height:24px;padding:0 12px;border-radius:12px;display:flex;gap:6px;align-items:center;justify-content:center;cursor:pointer;
+  border:1px solid rgba(0,0,0,.1);background:var(--raised);font-family:'Open Sans';font-weight:600;font-size:16px;letter-spacing:.15px;color:var(--primary);white-space:nowrap}
+.segtab.sel{border:2px solid var(--gold);color:var(--gold);font-weight:700;box-shadow:var(--e1)}
+.segtab .n{height:26px;min-width:26px;padding:0 8px;border-radius:12px;background:#1b1b1b;border:1px solid var(--glass);
+  display:flex;align-items:center;justify-content:center;font-family:'Open Sans';font-weight:700;font-size:16px;color:var(--n09)}
+.segtab.arrow{padding:0;width:52px}
+.segtab.arrow.dis{opacity:.35;pointer-events:none}
+.segtab.today{border:2px solid var(--gold);color:var(--gold)}
+
+/* ---------- LEDGER TABLE ---------- */
+#ledger{position:absolute;left:12px;top:150px;width:1000px;bottom:88px;z-index:4;
+  background:rgba(255,255,255,.02);border:1px solid var(--glass);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+/* list stays full-width; the detail SHEET overlays it (pattern from tgt-release txnsplit) */
+/* shared grid: TIME | TYPE | 7 denom cols | TOTAL */
+.lg{display:grid;grid-template-columns:96px 168px repeat(7,1fr) 128px;align-items:center;padding:0 16px}
+.lg>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
+.lg .r{text-align:right}
+.lg-head{flex:none;height:36px;box-shadow:inset 0 -1px var(--glass)}
+.lg-head span{font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--muted);text-transform:uppercase}
+.lg-head .dh{display:flex;align-items:center;justify-content:flex-end;gap:5px}
+.lg-head .dh .ci{width:20px;height:20px}
+/* plaque denom marker (rectangular gold) */
+.lg-head .dh .plaque{width:20px;height:15px;border-radius:3px;background:var(--accent);box-shadow:0 0 0 1px var(--panel) inset,0 0 0 2px var(--accent)}
+.lg-body{flex:1;min-height:0;overflow-y:auto}
+.lg-body::-webkit-scrollbar{width:6px}.lg-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.13);border-radius:3px}
+.lrow{height:51px;cursor:pointer;box-shadow:inset 0 -1px rgba(255,255,255,.05);transition:background .12s}
+.lrow:hover{background:rgba(255,255,255,.03)}
+/* selected row lifts above the dim scrim so it stays bright while the sheet is open */
+.lrow.sel{position:relative;z-index:6;box-shadow:inset 0 0 0 1.5px var(--gold);background:#171310;border-radius:8px}
+.lrow .tm{font-weight:600;font-size:16px;color:var(--primary)}
+.lrow .amt{font-weight:600;font-size:16px;color:var(--secondary);text-align:right}
+.lrow .tot{font-weight:600;font-size:16px;color:var(--primary);text-align:right}
+.lrow .delta{font-weight:700;font-size:16px;text-align:right}
+.lrow .delta.pos{color:var(--positive)}.lrow .delta.neg{color:var(--negative)}
+/* type pill */
+.tpill{display:inline-flex;align-items:center;gap:8px;height:29px;padding:0 12px;border-radius:9px;font-weight:700;font-size:14px;letter-spacing:.3px;white-space:nowrap;border:1px solid}
+.tpill .d{width:7px;height:7px;border-radius:50%}
+.tpill.gold{color:var(--accent);border-color:rgba(235,207,139,.5)}.tpill.gold .d{background:var(--accent)}
+.tpill.green{color:var(--positive);border-color:rgba(88,217,122,.5)}.tpill.green .d{background:var(--positive)}
+.tpill.red{color:var(--negative);border-color:rgba(232,90,107,.5)}.tpill.red .d{background:var(--negative)}
+.tpill.purple{color:var(--purple);border-color:rgba(199,155,242,.5)}.tpill.purple .d{background:var(--purple)}
+
+/* ---------- DETAIL OVERLAY — split pattern (from tgt-release txnsplit) ----------
+   The list stays full-width. A VISUAL-ONLY dim (pointer-events:none) covers it so
+   rows remain tappable for instant switching; the detail SHEET overlays from the right. */
+#dt-scrim{position:absolute;inset:0;z-index:33;background:rgba(5,4,3,.5);opacity:0;pointer-events:none;transition:opacity .2s ease}
+.ui-root.dt-open #dt-scrim{opacity:1}
+/* while EXPANDED the scrim becomes a real dismiss target (dims the whole screen) */
+.ui-root.dt-expanded #dt-scrim{background:rgba(5,4,3,.66);pointer-events:auto}
+#detail{position:absolute;left:406px;top:24px;height:720px;width:618px;z-index:34;
+  background:#100d0a;border-radius:22px 0 0 22px;overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:inset 0 0 0 1px var(--glass),-30px 0 70px -20px rgba(0,0,0,.8);
+  transform:translateX(618px);pointer-events:none;
+  transition:transform .26s cubic-bezier(.2,.75,.2,1),width .3s cubic-bezier(.2,.75,.2,1),right .3s,top .3s,bottom .3s,border-radius .3s}
+.ui-root.dt-open #detail{transform:translateX(0);pointer-events:auto}
+/* double-tap → expand to a large centred modal */
+.ui-root.dt-expanded #detail{left:132px;top:24px;height:720px;width:760px;border-radius:18px;transform:translateX(0);
+  box-shadow:inset 0 0 0 1px var(--glass),0 40px 90px -24px rgba(0,0,0,.85)}
+/* ----- detail panel — Figma 2059:147602 matrix layout ----- */
+.dt-head{flex:none;height:54px;display:flex;align-items:center;padding:0 13px;box-shadow:inset 0 -1px var(--glass)}
+.dt-head .tpill{height:29px}
+.dt-x{flex:none;margin-left:auto;width:44px;height:44px;border:none;background:none;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--secondary);font-size:16px}
+.dt-x:hover{background:var(--raised)}
+.dt-body{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:18px 16px;display:flex;flex-direction:column}
+.dt-body::-webkit-scrollbar{width:6px}.dt-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.13);border-radius:3px}
+/* sub: doc + times */
+.dt-sub{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.dt-sub .ln{display:flex;gap:6px;font-size:15px}
+.dt-sub .ln .k{font-weight:500;font-size:14px;color:var(--muted)}
+.dt-sub .ln .v{font-weight:700;color:var(--primary)}
+.dt-sub .times{display:flex;gap:24px}
+/* approve row */
+.dt-appr{display:flex;gap:24px;align-items:center;padding:12px 0;box-shadow:inset 0 -1px var(--glass);margin-bottom:12px}
+.dt-appr span{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--secondary)}
+.dt-appr .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+/* matrix table: DENOM | 8 chipset cols | TOTAL */
+.mxwrap{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;align-items:flex-start}
+.mxwrap::-webkit-scrollbar{height:8px;width:6px}
+.mxwrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:4px}
+.mx{width:1004px;display:grid;grid-template-columns:108px repeat(8,84px) 112px;align-items:center;column-gap:8px;font-variant-numeric:tabular-nums}
+.mx>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mx .r{text-align:right}
+.mx-head{height:34px;box-shadow:inset 0 -1px var(--glass)}
+.mx-head span{font-size:11px;font-weight:800;letter-spacing:.3px;color:var(--muted);text-transform:uppercase}
+.mx-row{min-height:48px;box-shadow:inset 0 -1px rgba(255,255,255,.05)}
+.mx-row .dn{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--primary)}
+.mx-row .dn img{width:22px;height:22px;flex:none}
+.mx-row .dn .plaque{width:22px;height:16px;border-radius:3px;background:var(--accent);flex:none;box-shadow:0 0 0 1.5px var(--panel) inset}
+.mx-row .cell{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;line-height:1.15;overflow:visible}
+.mx-row .cell .a{font-weight:700;font-size:15px;color:var(--accent);white-space:nowrap;line-height:21px}
+.mx-row .cell .q{font-weight:800;font-size:15px;color:var(--primary);line-height:20px}
+.mx-tot{height:30px;background:rgba(255,255,255,.04);border-radius:8px;margin-top:auto;position:sticky;bottom:0}
+.mx-tot span{font-size:14px;font-weight:800;color:var(--primary);white-space:nowrap}
+.mx-tot .lbl{color:var(--accent)}
+
+/* ---------- BOTTOM BAR ---------- */
+#txbar{position:absolute;left:0;bottom:0;width:1024px;height:80px;background:var(--panel);z-index:20;display:flex;align-items:center;padding:12px 16px}
+.tx-item{display:flex;align-items:center;gap:8px;padding:4px;cursor:pointer;background:none;border:none}
+.tx-ic{width:48px;height:48px;border-radius:12px;background:#5b5b5d;display:flex;align-items:center;justify-content:center;box-shadow:var(--e2)}
+.tx-ic img{width:24px;height:24px}
+.tx-l{font-family:'Open Sans';font-weight:700;font-size:16px;letter-spacing:.15px;color:var(--primary)}
+</style>
+</head>
+<body>
+<div class="ui-root">
+
+  <!-- ============ GLOBAL BAR ============ -->
+  <div id="gbar">
+    <div class="gbar-l">
+      <div class="iconbtn sq"><img class="g i" src="assets/concept-dark/menu.svg" alt=""></div>
+      <div class="tid"><span class="dot"></span><span class="nm">MD88012</span></div>
+      <div class="warnbtn"><img class="g i" src="assets/concept-dark/warn.svg" alt=""></div>
+    </div>
+    <div class="gbar-r">
+      <span class="g24box"><img class="g16 i" src="assets/concept-dark/card.svg" alt=""></span>
+      <span class="datetxt">25/06/2026</span>
+      <span class="g24box"><img class="g16 i" src="assets/concept-dark/calendar.svg" alt=""></span>
+      <span class="datetxt mono">25/06/2026  15:24:24</span>
+      <div class="pillbtn"><span class="g24box"><img class="gmoney" src="assets/concept-dark/money.svg" alt=""></span><span class="t">HKD 100/500</span></div>
+      <div class="pillbtn badgebtn"><img class="g24 i" src="assets/concept-dark/mail.svg" alt=""><span class="badge">3</span></div>
+      <div class="pillbtn"><img class="g24 i" src="assets/concept-dark/calc.svg" alt=""></div>
+    </div>
+  </div>
+
+  <!-- ============ BREADCRUMB + SEGMENTS ============ -->
+  <div id="crumb">Transaction Log</div>
+  <div id="seg">
+    <div class="segbox">
+      <div class="segtab sel" data-seg="all">All <span class="n">8</span></div>
+      <div class="segtab" data-seg="inv">Inv. <span class="n">5</span></div>
+      <div class="segtab" data-seg="player">Player <span class="n">3</span></div>
+    </div>
+    <div class="segbox">
+      <div class="segtab arrow" id="day-prev">◀</div>
+      <div class="segtab today" id="day-lbl">Today</div>
+      <div class="segtab arrow" id="day-next">▶</div>
+    </div>
+  </div>
+
+  <!-- ============ LEDGER ============ -->
+  <div id="ledger">
+    <div class="lg lg-head">
+      <span>TIME</span><span>TYPE</span>
+      <span class="dh"><img class="ci" src="assets/concept-dark/inventory/chip.svg" alt="">50K</span>
+      <span class="dh"><img class="ci" src="assets/concept-dark/inventory/chip.svg" alt="">10K</span>
+      <span class="dh"><span class="plaque"></span>10K</span>
+      <span class="dh"><img class="ci" src="assets/concept-dark/inventory/chip.svg" alt="">1K</span>
+      <span class="dh"><img class="ci" src="assets/concept-dark/inventory/chip.svg" alt="">500</span>
+      <span class="dh"><img class="ci" src="assets/concept-dark/inventory/chip.svg" alt="">100</span>
+      <span class="dh"><img class="ci" src="assets/concept-dark/inventory/chip.svg" alt="">50</span>
+      <span class="r">TOTAL AMT</span>
+    </div>
+    <div class="lg-body" id="lg-body"></div>
+  </div>
+
+  <!-- ============ DETAIL OVERLAY (Figma 2059:147602) ============ -->
+  <div id="dt-scrim"></div>
+  <div id="detail">
+    <div class="dt-head"><span class="tpill" id="dt-pill"><span class="d"></span><span id="dt-tt">—</span></span>
+      <button class="dt-x" id="dt-x" aria-label="Close">✕</button></div>
+    <div class="dt-body" id="dt-body"></div>
+  </div>
+
+  <!-- ============ BOTTOM BAR ============ -->
+  <div id="txbar">
+    <button class="tx-item" data-back><span class="tx-ic"><img src="assets/concept-dark/inventory/ic_back.svg" alt=""></span><span class="tx-l">Back</span></button>
+  </div>
+
+</div>
+<script>
+  (function(){
+    var root=document.querySelector('.ui-root');
+    var CHIP='assets/concept-dark/inventory/chip.svg';
+    var CHIPSETS=['VHK','PHK','PMK','JKH','NML','OKL','OIK','WER'];
+    // cat: 'inv' (OPENER/CLOSER/FILL/CREDIT) or 'player' (CASH IN/CHIP IN/CHIP EXCHANGE)
+    // mx: {denom:{marker:'chip'|'plaque', cells:{chipsetIndex:[amount,count]}}}  → the detail matrix
+    var TX=[
+      {t:'15:21:23', ty:'OPENER', k:'gold', cat:'inv', d:0, tot:1000000, doc:'TGFG/20232312/012', reqBy:'John D.', appBy:'John D.',
+        mx:[['50,000','chip',{1:['1,000,000','20'],7:['1,000,000','20']}],['10,000','plaque',{1:['200,000','20'],7:['200,000','20']}],['10,000','chip',{}],
+            ['1,000','chip',{0:['20,000','20'],3:['20,000','20'],7:['40,000','40']}],['500','chip',{0:['10,000','20'],3:['10,000','20'],7:['20,000','40']}],
+            ['100','chip',{0:['2,000','20'],3:['2,000','20'],7:['4,000','40']}],['50','plaque',{5:['1,000','20'],7:['1,000','20']}]],
+        tots:['32,000','1,200,000','','32,000','','4,000','','32,000'], grand:'1,268,000'},
+      {t:'15:21:22', ty:'FILL', k:'green', cat:'inv', d:1000000, tot:1000000, doc:'TGFG/20232312/013', reqBy:'John D.', appBy:'Amy L.',
+        mx:[['50,000','chip',{0:['1,000,000','20']}]], tots:['1,000,000','','','','','','',''], grand:'1,000,000'},
+      {t:'15:21:22', ty:'CREDIT', k:'red', cat:'inv', d:-1000000, tot:1000000, doc:'TGFG/20232312/014', reqBy:'John D.', appBy:'Amy L.',
+        mx:[['50,000','chip',{0:['1,000,000','20']}]], tots:['1,000,000','','','','','','',''], grand:'1,000,000'},
+      {t:'15:21:21', ty:'CASH IN', k:'green', cat:'player', d:0, tot:10000, doc:'TGFG/20232312/015', reqBy:'C.Tang', appBy:'John D.',
+        mx:[['10,000','plaque',{0:['10,000','1']}]], tots:['10,000','','','','','','',''], grand:'10,000'},
+      {t:'15:21:20', ty:'CHIP IN', k:'green', cat:'player', d:0, tot:10000, doc:'TGFG/20232312/016', reqBy:'C.Tang', appBy:'John D.',
+        mx:[['1,000','chip',{0:['10,000','10']}]], tots:['10,000','','','','','','',''], grand:'10,000'},
+      {t:'15:21:20', ty:'CHIP EXCHANGE', k:'purple', cat:'player', d:0, tot:10000, doc:'TGFG/20232312/017', reqBy:'A.Wong', appBy:'John D.',
+        mx:[['1,000','chip',{0:['10,000','10']}]], tots:['10,000','','','','','','',''], grand:'10,000'},
+      {t:'15:21:19', ty:'CLOSER', k:'gold', cat:'inv', d:0, tot:10000, doc:'TGFG/20232312/018', reqBy:'John D.', appBy:'John D.',
+        mx:[['1,000','chip',{0:['10,000','10']}]], tots:['10,000','','','','','','',''], grand:'10,000'},
+      {t:'15:21:19', ty:'OPENER', k:'gold', cat:'inv', d:0, tot:10000, doc:'TGFG/20232312/019', reqBy:'John D.', appBy:'John D.',
+        mx:[['1,000','chip',{0:['10,000','10']}]], tots:['10,000','','','','','','',''], grand:'10,000'}
+    ];
+    function fmt(n){ return n.toLocaleString('en-US'); }
+
+    // ---- build the ledger rows ----
+    function rowHtml(x,i){
+      var mid;
+      if(x.d!==0){ mid='<span class="delta '+(x.d>0?'pos':'neg')+'" style="grid-column:3/10;text-align:center">'+(x.d>0?'+':'')+fmt(x.d)+'</span>'; }
+      else {
+        var cells='';
+        for(var c=0;c<7;c++){ cells+=(c===3 && x.tot<=10000)? '<span class="amt r">'+fmt(x.tot)+'</span>' : '<span></span>'; }
+        mid=cells;
+      }
+      return '<div class="lrow lg" data-i="'+i+'" data-cat="'+x.cat+'" role="button" tabindex="0">'
+        +'<span class="tm">'+x.t+'</span>'
+        +'<span><span class="tpill '+x.k+'"><span class="d"></span>'+x.ty+'</span></span>'
+        +mid
+        +'<span class="tot r">'+fmt(x.tot)+'</span></div>';
+    }
+    var lgBody=document.getElementById('lg-body');
+    lgBody.innerHTML=TX.map(rowHtml).join('');
+
+    // ---- SEGMENT FILTER (All / Inv. / Player) ----
+    function applyFilter(seg){
+      document.querySelectorAll('.lrow').forEach(function(r){
+        r.style.display=(seg==='all'||r.getAttribute('data-cat')===seg)?'':'none';
+      });
+    }
+    document.querySelectorAll('[data-seg]').forEach(function(el){ el.addEventListener('click',function(){
+      document.querySelectorAll('[data-seg]').forEach(function(s){s.classList.remove('sel');}); el.classList.add('sel');
+      applyFilter(el.getAttribute('data-seg'));
+      if(root.classList.contains('dt-open')) closeDetail();   // filtering clears the open detail
+    });});
+
+    // ---- DETAIL PANEL (Figma matrix) ----
+    var sel=-1, lastTapI=-1, lastTapT=0;
+    function mxHead(){
+      return '<div class="mx mx-head"><span>DENOM</span>'
+        +CHIPSETS.map(function(c){return '<span class="r">'+c+'</span>';}).join('')
+        +'<span class="r">TOTAL</span></div>';
+    }
+    function mxRow(row){
+      var mk = row[1]==='plaque' ? '<span class="plaque"></span>' : '<img src="'+CHIP+'" alt="">';
+      var s='<div class="mx mx-row"><span class="dn">'+mk+row[0]+'</span>';
+      var amtSum=0, qtySum=0;
+      for(var c=0;c<8;c++){ var p=row[2][c];
+        if(p){ amtSum += +String(p[0]).replace(/[^0-9.]/g,''); qtySum += +p[1]; }
+        s+= p ? '<span class="cell"><span class="a">'+p[0]+'</span><span class="q">'+p[1]+'</span></span>' : '<span></span>';
+      }
+      // right-hand TOTAL per Figma dd-row (sum across the chipset columns)
+      s += qtySum
+        ? '<span class="cell tot"><span class="a">'+amtSum.toLocaleString('en-US')+'</span><span class="q">'+qtySum+'</span></span>'
+        : '<span></span>';
+      return s+'</div>';
+    }
+    function openDetail(i){
+      var x=TX[i]; sel=i;
+      document.querySelectorAll('.lrow').forEach(function(r){ r.classList.toggle('sel', +r.getAttribute('data-i')===i); });
+      document.getElementById('dt-pill').className='tpill '+x.k;
+      document.getElementById('dt-tt').textContent=x.ty;
+      var tots='<div class="mx mx-tot"><span class="lbl">TOTAL</span>'
+        +x.tots.map(function(t){return '<span class="r">'+(t||'')+'</span>';}).join('')
+        +'<span class="r">'+x.grand+'</span></div>';
+      document.getElementById('dt-body').innerHTML=
+         '<div class="dt-sub">'
+          +'<div class="ln"><span class="k">Doc.</span><span class="v">'+x.doc+'</span></div>'
+          +'<div class="times"><div class="ln"><span class="k">Time</span><span class="v">'+CUR_DATE+'</span></div>'
+            +'<div class="ln"><span class="k">Time</span><span class="v">'+x.t+'</span></div></div>'
+         +'</div>'
+        +'<div class="dt-appr"><span><span class="dot"></span>Requested · '+x.reqBy+'</span><span><span class="dot"></span>Approved · '+x.appBy+'</span></div>'
+        +'<div class="mxwrap">'+mxHead()+x.mx.map(mxRow).join('')+tots+'</div>';
+      root.classList.add('dt-open');
+    }
+    function closeDetail(){ root.classList.remove('dt-open','dt-expanded'); sel=-1;
+      document.querySelectorAll('.lrow.sel').forEach(function(r){r.classList.remove('sel');}); }
+    function expandDetail(){ if(root.classList.contains('dt-open')) root.classList.add('dt-expanded'); }
+
+    // row taps: single = open/switch · double = expand
+    lgBody.addEventListener('click',function(e){
+      var r=e.target.closest('.lrow'); if(!r||r.style.display==='none') return; var i=+r.getAttribute('data-i');
+      var now=Date.now();
+      if(i===lastTapI && (now-lastTapT)<330){ expandDetail(); } else { openDetail(i); }
+      lastTapI=i; lastTapT=now;
+    });
+    document.getElementById('dt-x').addEventListener('click',closeDetail);
+    document.getElementById('dt-scrim').addEventListener('click',function(){ root.classList.remove('dt-expanded'); });
+
+    // ---- DATE SELECTOR (◀ prev / ▶ next) ----
+    var days=['23/06/2025','24/06/2025','25/06/2025','26/06/2025'], di=2;   // 'Today' = 25/06
+    var CUR_DATE=days[di];
+    function setDay(n){ di=Math.max(0,Math.min(days.length-1,n)); CUR_DATE=days[di];
+      var lbl=document.getElementById('day-lbl'); if(lbl) lbl.textContent=(di===2?'Today':days[di].slice(0,5));
+      document.getElementById('day-prev').classList.toggle('dis',di===0);
+      document.getElementById('day-next').classList.toggle('dis',di===days.length-1);
+      if(root.classList.contains('dt-open')) closeDetail();
+    }
+    document.getElementById('day-prev').addEventListener('click',function(){ setDay(di-1); });
+    document.getElementById('day-next').addEventListener('click',function(){ setDay(di+1); });
+    setDay(di);
+
+    // ---- Back → landing page ----
+    document.querySelectorAll('[data-back]').forEach(function(el){ el.addEventListener('click',function(){ location.href='concept-table-dark.html'; }); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ if(root.classList.contains('dt-open')) closeDetail(); else location.href='concept-table-dark.html'; } });
+  })();
+</script>
+</body>
+</html>

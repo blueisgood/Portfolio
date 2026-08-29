@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept TGT · Inventory Summary — MD88012</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Open+Sans:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Concept TGT — Inventory Summary  1024×768
+   Reached by tapping the "Inventory Low" attention item.
+   Rebuilt from Figma node 2021:68973.
+   ============================================================ */
+:root{
+  --canvas:#0e0b09; --raised:rgba(255,255,255,.05); --card:rgba(14,12,9,.85);
+  --panel:rgba(8,6,5,.94); --glass:rgba(255,255,255,.1);
+  --primary:#f3efe6; --secondary:#a79f92; --muted:#7a736a; --accent:#ebcf8b;
+  --positive:#4bd07a; --negative:#e85a6b; --info:#5aa8e8; --warning:#e0b64d;
+  --gold:#cea02c; --n09:#fdfdfd;
+  --e1:0 2px 4px rgba(0,0,0,.1); --e2:0 4px 12px rgba(0,0,0,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{width:100vw;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:#000;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--primary)}
+.ui-root{position:relative;width:1024px;height:768px;overflow:hidden;background:var(--canvas)}
+img.i{display:block;width:100%;height:100%}
+
+/* ---------- GLOBAL BAR ---------- */
+#gbar{position:absolute;left:0;top:0;width:1024px;height:64px;background:var(--panel);
+  display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:30}
+.gbar-l{display:flex;align-items:center;gap:12px}
+.iconbtn{background:var(--raised);border:1px solid var(--glass);border-radius:16px;
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--e2)}
+.iconbtn.sq{width:48px;height:48px}
+.iconbtn.sq .g{width:19px;height:19px}
+.tid{background:var(--raised);border:1px solid var(--glass);border-radius:16px;height:48px;
+  display:flex;align-items:center;gap:4px;padding:0 12px;box-shadow:var(--e1)}
+.tid .dot{width:8px;height:8px;border-radius:50%;background:var(--positive)}
+.tid .nm{font-weight:800;font-size:18px;color:var(--primary)}
+.warnbtn{padding:12px;border-radius:16px;display:flex;align-items:center}
+.warnbtn .g{width:24px;height:24px}
+.gbar-r{display:flex;align-items:center;gap:12px;justify-content:flex-end}
+.gbar-r .g24{width:24px;height:24px}
+.gbar-r .g24box{width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.gbar-r .g16{width:16px;height:16px}
+.pillbtn .gmoney{width:15px;height:15px;object-fit:contain}
+.datetxt{font-weight:600;font-size:16px;color:var(--primary);white-space:nowrap}
+.datetxt.mono{white-space:pre}
+.pillbtn{background:var(--raised);border:1px solid var(--glass);border-radius:16px;
+  display:flex;align-items:center;gap:12px;padding:12px;box-shadow:var(--e2)}
+.pillbtn .g24{width:24px;height:24px}
+.pillbtn .t{font-weight:700;font-size:16px;color:var(--primary);white-space:nowrap}
+.badgebtn{position:relative}
+.badge{position:absolute;left:26px;top:3px;min-width:18px;height:18px;padding:0 4px;border-radius:43px;
+  background:var(--negative);display:flex;align-items:center;justify-content:center;
+  font-family:'Open Sans';font-weight:700;font-size:12px;line-height:1;color:var(--n09)}
+
+/* ---------- INVENTORY LOW attention panel — first item in the scroll strip (Figma 2032:29186) ---------- */
+#inv-alert{flex:none;width:258px;height:100%;align-self:flex-start;
+  background:rgba(255,255,255,.04);border:1px solid var(--negative);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.ac-head{display:flex;gap:11px;align-items:flex-start;padding:14px 15px}
+.ac-head .dot{width:9px;height:16px;display:flex;align-items:center}
+.ac-head .dot i{width:9px;height:9px;border-radius:50%;background:var(--warning);display:block;margin-top:3px}
+.ac-head .ttl{flex:1;font-weight:800;font-size:13.5px;letter-spacing:.27px;color:var(--primary)}
+.ac-head .time{font-weight:500;font-size:10.5px;color:var(--muted);white-space:nowrap}
+.ac-head .chev{width:13px;height:13px;opacity:.7}
+.ac-body{border-top:1px solid rgba(255,255,255,.07);padding:12px 15px 15px;display:flex;flex-direction:column;gap:12px}
+.ac-body .desc{font-weight:500;font-size:14px;line-height:1.6;color:var(--secondary)}
+.ac-meter{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.ac-meter i{display:block;height:6px;width:12%;background:var(--negative);border-radius:3px}
+.meter-row{display:flex;align-items:center;justify-content:space-between}
+.meter-row span{font-weight:800;font-size:12px;letter-spacing:.72px;color:var(--secondary)}
+.opt{background:rgba(255,255,255,.05);border:1px solid rgba(0,0,0,.1);box-shadow:inset 0 0 0 1px var(--glass);
+  border-radius:11px;padding:10px;cursor:pointer;transition:background .12s}
+.opt:hover{background:rgba(255,255,255,.09)}
+.opt .t{font-weight:800;font-size:14px;color:var(--primary);line-height:1.3}
+.opt .s{font-weight:500;font-size:14px;color:var(--secondary);margin-top:2px}
+.opt .rec{display:inline-block;margin-top:9px;border:1px solid rgba(88,217,122,.5);border-radius:8px;padding:2px 7px;
+  font-weight:800;font-size:9px;letter-spacing:.72px;color:#58d97a}
+
+/* ---------- MAIN · one continuous horizontal free-scroll strip ----------
+   Item 1 = INVENTORY LOW attention panel · item 2 = INVENTORY SUMMARY · items 3-7 = the 5 floats.
+   Swiping horizontally moves everything (including the attention panel). Vertical scroll hidden — rows fit. */
+#panels{position:absolute;left:12px;top:68px;width:1000px;bottom:80px;z-index:3;
+  display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding-right:2px}
+#panels::-webkit-scrollbar{height:8px}
+#panels::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px}
+#panels::-webkit-scrollbar-track{background:rgba(255,255,255,.03)}
+.panel{flex:none;width:718px;height:100%;background:rgba(255,255,255,.02);border:1px solid var(--glass);
+  border-radius:13px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+/* panel header — float name only (no total per request) */
+.p-head{flex:none;height:44px;display:flex;align-items:center;padding:0 16px;
+  background:rgba(255,255,255,.03);box-shadow:inset 0 -1px var(--glass)}
+.p-head .nm{font-weight:800;font-size:13px;letter-spacing:.6px;color:var(--primary);text-transform:uppercase}
+/* the matrix inside a panel — DENOM · 8 chipset columns · TOTAL (fits, no vertical scroll) */
+.itg{display:grid;grid-template-columns:96px repeat(8,1fr) 78px;align-items:center;
+  font-variant-numeric:tabular-nums;padding:0 12px;column-gap:3px}
+.itg>span,.itg>div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.itg .r{text-align:right}
+.it-head{flex:none;height:30px;box-shadow:inset 0 -1px var(--glass)}
+.it-head span{font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;line-height:30px}
+.it-tot{flex:none;height:28px;background:rgba(255,255,255,.04)}
+.it-tot span{font-size:12px;font-weight:800;line-height:28px;color:var(--primary)}
+.it-body{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+/* denom row — flex-grows so all rows share the panel height evenly (no vertical scrollbar) */
+.ddrow{flex:1;min-height:0;box-shadow:inset 0 -1px rgba(255,255,255,.05)}
+.ddrow .denom{display:flex;align-items:center;gap:8px}
+.ddrow .denom .ic{width:24px;height:24px;flex:none}
+.ddrow .denom b{font-weight:700;font-size:14px;color:var(--primary)}
+/* plaque denom marker (rectangular, per Figma 2021:69034) */
+.plaque{width:24px;height:24px;position:relative;flex:none}
+.plaque::before{content:"";position:absolute;left:0;top:3px;width:24px;height:18px;border-radius:4px;background:var(--accent);box-shadow:0 0 0 1px var(--panel)}
+.plaque::after{content:"";position:absolute;left:4px;top:7px;width:16px;height:10px;border-radius:3px;background:var(--accent);box-shadow:0 0 0 1.6px var(--panel)}
+/* a chipset cell — amount (gold) over count (white), stacked */
+.ddrow .cell{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;line-height:1.12}
+.ddrow .cell .amt{font-weight:700;font-size:11.5px;color:var(--accent)}
+.ddrow .cell .cnt{font-weight:800;font-size:13px;color:var(--primary)}
+
+/* ---------- BOTTOM BAR (Figma 2021:69383 — consistent height/padding with Full Update bar) ---------- */
+#binvbar{position:absolute;left:0;bottom:0;width:1024px;height:72px;background:var(--panel);z-index:20;
+  display:flex;align-items:center;justify-content:space-between;padding:8px 12px}
+.bb-grp{display:flex;gap:12px;align-items:center}
+.bb-item{display:flex;align-items:center;gap:8px;padding:4px;cursor:pointer;background:none;border:none}
+.bb-ic{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:var(--e2);flex:none}
+.bb-ic img{width:24px;height:24px;display:block}
+.bb-ic.back{background:#5b5b5d}
+.bb-ic.smart{background:#5aa8e8}
+.bb-ic.smart svg{width:24px;height:24px;display:block}
+.bb-ic.full{background:#e0b64d}
+.bb-ic.quick{background:var(--n09)}
+.bb-ic.fill{background:#4ea86b}
+.bb-ic.credit{background:var(--negative)}
+.bb-ic.fcreq{background:var(--n09)}
+.bb-l{font-family:'Open Sans';font-weight:700;font-size:16px;letter-spacing:.15px;color:var(--primary);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="ui-root">
+
+  <!-- ============ GLOBAL BAR ============ -->
+  <div id="gbar">
+    <div class="gbar-l">
+      <div class="iconbtn sq"><img class="g i" src="assets/concept-dark/menu.svg" alt=""></div>
+      <div class="tid"><span class="dot"></span><span class="nm">MD88012</span></div>
+      <div class="warnbtn"><img class="g i" src="assets/concept-dark/warn.svg" alt=""></div>
+    </div>
+    <div class="gbar-r">
+      <span class="g24box"><img class="g16 i" src="assets/concept-dark/card.svg" alt=""></span>
+      <span class="datetxt">25/06/2026</span>
+      <span class="g24box"><img class="g16 i" src="assets/concept-dark/calendar.svg" alt=""></span>
+      <span class="datetxt mono">25/06/2026  15:24:24</span>
+      <div class="pillbtn"><span class="g24box"><img class="gmoney" src="assets/concept-dark/money.svg" alt=""></span><span class="t">HKD 100/500</span></div>
+      <div class="pillbtn badgebtn"><img class="g24 i" src="assets/concept-dark/mail.svg" alt=""><span class="badge">3</span></div>
+      <div class="pillbtn"><img class="g24 i" src="assets/concept-dark/calc.svg" alt=""></div>
+    </div>
+  </div>
+
+  <!-- ============ MAIN · horizontal free-scroll strip ============
+       Item 1 = INVENTORY LOW attention panel · item 2 = INVENTORY SUMMARY · items 3-7 = the 5 floats.
+       Everything scrolls together. -->
+  <div id="panels">
+    <!-- INVENTORY LOW attention panel — first item, scrolls with the rest -->
+    <div id="inv-alert">
+      <div class="ac-head">
+        <span class="dot"><i></i></span>
+        <span class="ttl">INVENTORY LOW</span>
+        <span class="time">8:34 PM</span>
+        <img class="chev" src="assets/concept-dark/inventory/chev.svg" alt="">
+      </div>
+      <div class="ac-body">
+        <div class="desc">Tray balance is at 12% — below the 20% floor threshold. A fill should be requested before the next shoe.</div>
+        <div class="ac-meter"><i></i></div>
+        <div class="meter-row"><span>12% NOW</span><span>FLOOR 20%</span></div>
+        <div class="opt" role="button" tabindex="0">
+          <div class="t">Request standard fill — $50,000</div>
+          <div class="s">Cage dispatch · est. 6 min</div>
+          <span class="rec">RECOMMENDED</span>
+        </div>
+        <div class="opt" role="button" tabindex="0">
+          <div class="t">Defer 30 min</div>
+          <div class="s">Tray projected to reach 7%</div>
+        </div>
+      </div>
+    </div>
+    <!-- the 6 data panels are appended here by JS -->
+  </div>
+
+  <!-- ============ BOTTOM BAR ============ -->
+  <div id="binvbar">
+    <div class="bb-grp">
+      <button class="bb-item" data-back><span class="bb-ic back"><img src="assets/concept-dark/inventory/ic_back.svg" alt=""></span><span class="bb-l">Back</span></button>
+    </div>
+    <div class="bb-grp">
+      <button class="bb-item" data-smart><span class="bb-ic smart"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2L4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5z" fill="#fdfdfd"/></svg></span><span class="bb-l">Smart Sync</span></button>
+      <button class="bb-item" data-full><span class="bb-ic full"><img src="assets/concept-dark/inventory/ic_full.svg" alt=""></span><span class="bb-l">Full Update</span></button>
+      <button class="bb-item"><span class="bb-ic quick"><img src="assets/concept-dark/inventory/ic_quick.svg" alt=""></span><span class="bb-l">Quick Update</span></button>
+      <button class="bb-item"><span class="bb-ic fill"><img src="assets/concept-dark/inventory/ic_fill.svg" alt=""></span><span class="bb-l">FIll</span></button>
+      <button class="bb-item"><span class="bb-ic credit"><img src="assets/concept-dark/inventory/ic_credit.svg" alt=""></span><span class="bb-l">Credit</span></button>
+      <button class="bb-item"><span class="bb-ic fcreq"><img src="assets/concept-dark/inventory/ic_fcreq.svg" alt=""></span><span class="bb-l">F/C Reqs</span></button>
+    </div>
+  </div>
+
+</div>
+<script>
+  (function(){
+    var CHIP='assets/concept-dark/inventory/chip.svg';
+    var CHIPSETS=['VHK','PHK','PMK','JKH','NML','OKL','OIK','WER'];
+    // denom marker: 'chip' (round) or 'plaque' (rectangle) per Figma
+    var DENOMS=[
+      {v:'50,000',mk:'chip'},{v:'10,000',mk:'plaque'},{v:'10,000',mk:'chip'},{v:'1,000',mk:'chip'},
+      {v:'500',mk:'chip'},{v:'100',mk:'chip'},{v:'50',mk:'plaque'},{v:'50',mk:'chip'},{v:'25',mk:'chip'},{v:'10',mk:'chip'}
+    ];
+    // Each panel = a denom × chipset MATRIX. cells: {chipsetIndex:[amount,count]}.
+    // Column order: VHK(0) PHK(1) PMK(2) JKH(3) NML(4) OKL(5) OIK(6) WER(7)
+    var PANELS=[
+      {name:'INVENTORY SUMMARY', total:'1,268,000',
+       colTotals:['32,000','1,200,000','','32,000','','4,000','','32,000'],
+       rows:[
+        {1:['1,000,000','20']},
+        {1:['200,000','20']},
+        {},
+        {0:['20,000','20'],3:['20,000','20'],7:['40,000','40']},
+        {0:['10,000','20'],3:['10,000','20'],7:['20,000','40']},
+        {0:['2,000','20'],3:['2,000','20'],7:['4,000','40']},
+        {5:['1,000','20'],7:['1,000','20']},
+        {5:['1,000','20'],7:['1,000','20']},
+        {5:['2,000','80'],7:['2,000','80']},
+        {}
+      ]},
+      {name:'TOP RACK', total:'50,000',
+       colTotals:['32,000','','','','','','','18,000'],
+       rows:[
+        {},{},{},
+        {0:['20,000','20'],7:['20,000','20']},
+        {0:['10,000','20']},
+        {0:['2,000','20']},
+        {7:['1,000','20']},{},{7:['2,000','80']},{}
+      ]},
+      {name:'SUNKEN RACK', total:'50,000',
+       colTotals:['32,000','','','','','','','18,000'],
+       rows:[
+        {},{},{},
+        {0:['20,000','20'],7:['20,000','20']},
+        {0:['10,000','20']},
+        {0:['2,000','20']},
+        {7:['1,000','20']},{},{7:['2,000','80']},{}
+      ]},
+      {name:'CABINET TOP DRAWER', total:'5,000',
+       colTotals:['','','','','','3,000','','2,000'],
+       rows:[
+        {},{},{},{},
+        {5:['2,000','20']},
+        {5:['1,000','20'],7:['1,000','20']},
+        {},{5:['500','20']},{7:['1,000','40']},{}
+      ]},
+      {name:'CABINET BOTTOM DRAWER', total:'5,000',
+       colTotals:['','','','','','3,000','','2,000'],
+       rows:[
+        {},{},{},{},
+        {5:['2,000','20']},
+        {5:['1,000','20'],7:['1,000','20']},
+        {},{5:['500','20']},{7:['1,000','40']},{}
+      ]},
+      {name:'EXTERNAL FLOAT', total:'160,000',
+       colTotals:['150,000','','','','10,000','','','',],
+       rows:[
+        {0:['150,000','3']},
+        {4:['10,000','1']},
+        {},{},{},{},{},{},{},{}
+      ]}
+    ];
+    function marker(mk){ return mk==='plaque' ? '<span class="plaque ic"></span>' : '<img class="ic" src="'+CHIP+'" alt="">'; }
+    function cell(pair){ return pair ? '<div class="cell"><span class="amt">'+pair[0]+'</span><span class="cnt">'+pair[1]+'</span></div>' : '<span></span>'; }
+    function ddrow(denom,cells){
+      var s='<div class="ddrow itg"><span class="denom">'+marker(denom.mk)+'<b>'+denom.v+'</b></span>';
+      for(var c=0;c<8;c++){ s+=cell(cells[c]); }
+      s+='<span></span></div>';   // TOTAL column (per-row total blank in Figma sample)
+      return s;
+    }
+    var html=PANELS.map(function(p){
+      var head='<div class="itg it-head"><span>DENOM</span>'
+        +CHIPSETS.map(function(c){return '<span class="r">'+c+'</span>';}).join('')
+        +'<span class="r">TOTAL</span></div>';
+      var totrow='<div class="itg it-tot"><span>TOTAL</span>'
+        +p.colTotals.map(function(t){return '<span class="r">'+(t||'')+'</span>';}).join('')
+        +'<span class="r">'+p.total+'</span></div>';
+      var body=DENOMS.map(function(d,i){ return ddrow(d,p.rows[i]); }).join('');
+      return '<div class="panel">'
+        +'<div class="p-head"><span class="nm">'+p.name+'</span></div>'
+        +head+totrow
+        +'<div class="it-body">'+body+'</div>'
+        +'</div>';
+    }).join('');
+    document.getElementById('panels').insertAdjacentHTML('beforeend',html);
+    // back → dark table
+    document.querySelectorAll('[data-back]').forEach(function(el){
+      el.addEventListener('click',function(){ location.href='concept-table-dark.html'; });
+    });
+    // Full Update → the full-update editor
+    document.querySelectorAll('[data-full]').forEach(function(el){
+      el.addEventListener('click',function(){ location.href='full-update.html'; });
+    });
+    // Smart Sync → the smart-sync review (auto-syncs with the database on entry)
+    document.querySelectorAll('[data-smart]').forEach(function(el){
+      el.addEventListener('click',function(){ location.href='smart-sync.html'; });
+    });
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')location.href='concept-table-dark.html';});
+  })();
+</script>
+</body>
+</html>

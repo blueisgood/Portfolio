@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept TGT · Settings — MD88012</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Open+Sans:wght@600;700&family=Noto+Sans+SC:wght@700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Concept TGT — Settings  1024×768  (dark; opened from the dark table)
+   Rebuilt from Figma node 2083:93147 / 2086:91720.
+   Language · Smart Table · Appearance  segmented controls.
+   ============================================================ */
+/* DARK tokens (default) */
+:root{
+  --canvas:#0e0b09; --raised:rgba(255,255,255,.05); --card:rgba(14,12,9,.85);
+  --panel:rgba(8,6,5,.94); --glass:rgba(255,255,255,.1); --hair:rgba(255,255,255,.1);
+  --primary:#f3efe6; --secondary:#a79f92; --muted:#7a736a; --accent:#ebcf8b;
+  --positive:#4bd07a; --negative:#e85a6b; --gold:#cea02c; --n09:#fdfdfd;
+  --seg-bg:rgba(255,255,255,.06); --upd-check:invert;
+  --e1:0 2px 4px rgba(0,0,0,.1); --e2:0 4px 12px rgba(0,0,0,.1);
+}
+/* LIGHT tokens — applied live when Appearance = Light */
+.ui-root.light{
+  --canvas:#f9f3ee; --raised:rgba(255,255,255,.7); --card:rgba(255,255,255,.85);
+  --panel:rgba(249,243,238,.94); --glass:rgba(255,255,255,.75); --hair:rgba(0,0,0,.1);
+  --primary:#1b1b1b; --secondary:#5b5b5d; --muted:#a6a7ae; --accent:#ca981e;
+  --positive:#38c269; --n09:#fdfdfd;
+  --seg-bg:#fdfdfd; --upd-check:none;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{width:100vw;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:#000;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--primary)}
+.ui-root{position:relative;width:1024px;height:768px;overflow:hidden;background:var(--canvas);
+  transition:background .28s ease}
+/* everything that reads theme vars fades smoothly on the live switch */
+#gbar,#setbar,#sheet,#crumb,.tid,.iconbtn,.pillbtn,.srow .lbl,.seg,.seg .opt,.set-l,.datetxt,.set-ic,.set-update .ic{
+  transition:background-color .28s ease,color .28s ease,border-color .28s ease,box-shadow .28s ease}
+img.i{display:block;width:100%;height:100%}
+
+/* ---------- GLOBAL BAR ---------- */
+#gbar{position:absolute;left:0;top:0;width:1024px;height:64px;background:var(--panel);
+  display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:30}
+.gbar-l{display:flex;align-items:center;gap:12px}
+.iconbtn{background:var(--raised);border:1px solid var(--glass);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:var(--e2)}
+.iconbtn.sq{width:48px;height:48px}.iconbtn.sq .g{width:19px;height:19px}
+.tid{background:var(--raised);border:1px solid var(--glass);border-radius:16px;height:48px;display:flex;align-items:center;gap:4px;padding:0 12px;box-shadow:var(--e1)}
+.tid .dot{width:8px;height:8px;border-radius:50%;background:var(--positive)}
+.tid .nm{font-weight:800;font-size:18px;color:var(--primary)}
+.warnbtn{padding:12px;border-radius:16px;display:flex;align-items:center}.warnbtn .g{width:24px;height:24px}
+.gbar-r{display:flex;align-items:center;gap:12px;justify-content:flex-end}
+.gbar-r .g24box{width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.gbar-r .g16{width:16px;height:16px}
+.pillbtn .gmoney{width:15px;height:15px;object-fit:contain}
+.datetxt{font-weight:600;font-size:16px;color:var(--primary);white-space:nowrap}
+.datetxt.mono{white-space:pre}
+.pillbtn{background:var(--raised);border:1px solid var(--glass);border-radius:16px;display:flex;align-items:center;gap:12px;padding:12px;box-shadow:var(--e2)}
+.pillbtn .g24{width:24px;height:24px}.pillbtn .t{font-weight:700;font-size:16px;color:var(--primary);white-space:nowrap}
+.badgebtn{position:relative}
+.badge{position:absolute;left:26px;top:3px;min-width:18px;height:18px;padding:0 4px;border-radius:43px;background:var(--negative);
+  display:flex;align-items:center;justify-content:center;font-family:'Open Sans';font-weight:700;font-size:12px;line-height:1;color:var(--n09)}
+
+/* ---------- BREADCRUMB ---------- */
+#crumb{position:absolute;left:12px;top:64px;height:19px;z-index:5;font-weight:800;font-size:15px;letter-spacing:.5px;color:var(--muted)}
+
+/* ---------- SETTINGS SHEET (centered card) ---------- */
+#sheet{position:absolute;left:170px;top:131px;width:668px;z-index:4;
+  background:var(--raised);border:1px solid var(--glass);border-radius:14px;overflow:hidden;box-shadow:var(--e2);padding:0 16px}
+.srow{height:72px;display:flex;align-items:center;justify-content:space-between;box-shadow:inset 0 -1px var(--hair)}
+.srow:last-child{box-shadow:none}
+.srow .lbl{font-family:'Open Sans';font-weight:700;font-size:18px;color:var(--primary)}
+/* segmented control */
+.seg{background:var(--seg-bg);border:1px solid var(--hair);border-radius:16px;box-shadow:var(--e1);
+  height:52px;display:flex;align-items:center;padding:4px;gap:2px}
+.seg .opt{height:44px;min-width:44px;padding:0 16px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-family:'Open Sans';font-weight:700;font-size:16px;letter-spacing:.15px;color:var(--secondary);white-space:nowrap;transition:background .12s,color .12s}
+.seg .opt.zh{font-family:'Noto Sans SC','Open Sans',sans-serif}
+.seg .opt.sel{background:var(--accent);color:#1b1b1b;box-shadow:var(--e1)}
+.seg .opt:not(.sel):hover{color:var(--primary)}
+
+/* ---------- BOTTOM BAR ---------- */
+#setbar{position:absolute;left:0;bottom:0;width:1024px;height:80px;background:var(--panel);z-index:20;display:flex;align-items:center;padding:12px 16px}
+.set-item{display:flex;align-items:center;gap:8px;padding:4px;cursor:pointer;background:none;border:none}
+.set-ic{width:48px;height:48px;border-radius:12px;background:#5b5b5d;display:flex;align-items:center;justify-content:center;box-shadow:var(--e2)}
+.set-ic img{width:24px;height:24px}
+.set-l{font-family:'Open Sans';font-weight:700;font-size:16px;letter-spacing:.15px;color:var(--primary)}
+/* Update button (right side of the bar) — confirms the settings change */
+#setbar .spacer{flex:1}
+.set-update{display:flex;align-items:center;gap:8px;padding:4px;cursor:pointer;background:none;border:none}
+.set-update .ic{width:48px;height:48px;border-radius:12px;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:var(--e2)}
+.set-update .ic img{width:24px;height:24px}
+/* dark mode: bright gold btn → tint the check dark for contrast. light mode: brass btn → keep white check */
+.ui-root:not(.light) .set-update .ic img{filter:brightness(0)}
+.set-update .l{font-family:'Open Sans';font-weight:700;font-size:16px;letter-spacing:.15px;color:var(--primary)}
+</style>
+</head>
+<body>
+<div class="ui-root" id="root">
+
+  <!-- ============ GLOBAL BAR ============ -->
+  <div id="gbar">
+    <div class="gbar-l">
+      <div class="iconbtn sq"><img class="g i" src="assets/concept-dark/menu.svg" alt=""></div>
+      <div class="tid"><span class="dot"></span><span class="nm">MD88012</span></div>
+      <div class="warnbtn"><img class="g i" src="assets/concept-dark/warn.svg" alt=""></div>
+    </div>
+    <div class="gbar-r">
+      <span class="g24box"><img class="g16 i" src="assets/concept-dark/card.svg" alt=""></span>
+      <span class="datetxt">25/06/2026</span>
+      <span class="g24box"><img class="g16 i" src="assets/concept-dark/calendar.svg" alt=""></span>
+      <span class="datetxt mono">25/06/2026  15:24:24</span>
+      <div class="pillbtn"><span class="g24box"><img class="gmoney" src="assets/concept-dark/money.svg" alt=""></span><span class="t">HKD 100/500</span></div>
+      <div class="pillbtn badgebtn"><img class="g24 i" src="assets/concept-dark/mail.svg" alt=""><span class="badge">3</span></div>
+      <div class="pillbtn"><img class="g24 i" src="assets/concept-dark/calc.svg" alt=""></div>
+    </div>
+  </div>
+
+  <!-- ============ BREADCRUMB ============ -->
+  <div id="crumb">Settings</div>
+
+  <!-- ============ SETTINGS SHEET ============ -->
+  <div id="sheet">
+    <div class="srow">
+      <span class="lbl">Language</span>
+      <div class="seg" data-group="lang">
+        <div class="opt sel" data-v="en">English</div>
+        <div class="opt zh" data-v="tc">繁体</div>
+        <div class="opt zh" data-v="sc">简体</div>
+      </div>
+    </div>
+    <div class="srow">
+      <span class="lbl">Smart Table</span>
+      <div class="seg" data-group="smart">
+        <div class="opt sel" data-v="on">On</div>
+        <div class="opt" data-v="off">Off</div>
+      </div>
+    </div>
+    <div class="srow">
+      <span class="lbl">Appearance</span>
+      <div class="seg" data-group="theme">
+        <div class="opt" data-v="light">Light</div>
+        <div class="opt sel" data-v="dark">Dark</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BOTTOM BAR ============ -->
+  <div id="setbar">
+    <button class="set-item" data-back><span class="set-ic"><img src="assets/concept-dark/inventory/ic_back.svg" alt=""></span><span class="set-l">Back</span></button>
+    <span class="spacer"></span>
+    <button class="set-update" id="update-btn"><span class="ic"><img src="assets/concept-dark/aml/ic_check.svg" alt=""></span><span class="l">Update</span></button>
+  </div>
+
+</div>
+<script>
+  (function(){
+    var root=document.getElementById('root'), updateBtn=document.getElementById('update-btn');
+    // which mode the settings screen was OPENED in (?mode=light|dark) — Back returns here
+    var OPENED = /mode=light/.test(location.search) ? 'light' : 'dark';
+    function chosenTheme(){ return document.querySelector('[data-group="theme"] .opt.sel').getAttribute('data-v'); }
+    function chosenSmart(){ return document.querySelector('[data-group="smart"] .opt.sel').getAttribute('data-v'); }
+    // reflect the stored Smart Table choice on load (default = on)
+    (function(){
+      var stored = localStorage.getItem('tgt-smart') || 'on';
+      document.querySelectorAll('[data-group="smart"] .opt').forEach(function(o){
+        o.classList.toggle('sel', o.getAttribute('data-v')===stored);
+      });
+    })();
+
+    // apply a theme LIVE to this screen: flip the token class + swap the global-bar icon folder
+    function applyTheme(mode){
+      root.classList.toggle('light', mode==='light');
+      var from = mode==='light' ? 'concept-dark/' : 'concept/';
+      var to   = mode==='light' ? 'concept/'      : 'concept-dark/';
+      root.querySelectorAll('img').forEach(function(img){
+        var s=img.getAttribute('src')||'';
+        // ONLY swap the global-bar glyphs that live directly in concept-dark/ or concept/
+        // (skip the shared Back/Update icons in concept-dark/inventory/ and concept-dark/aml/).
+        if(s.indexOf('/inventory/')!==-1 || s.indexOf('/aml/')!==-1) return;
+        if(s.indexOf('/'+from)!==-1){ img.setAttribute('src', s.replace('/'+from, '/'+to)); }
+      });
+    }
+    // reflect the chosen theme in the Appearance segment on load
+    function selectSeg(mode){
+      document.querySelectorAll('[data-group="theme"] .opt').forEach(function(o){
+        o.classList.toggle('sel', o.getAttribute('data-v')===mode);
+      });
+    }
+
+    // initial state = the mode this screen was opened in
+    selectSeg(OPENED); applyTheme(OPENED);
+
+    // segments: single-select; Appearance taps LIVE-PREVIEW the theme immediately
+    document.querySelectorAll('.seg').forEach(function(seg){
+      seg.addEventListener('click',function(e){
+        var opt=e.target.closest('.opt'); if(!opt||opt.classList.contains('sel')) return;
+        seg.querySelectorAll('.opt').forEach(function(o){o.classList.remove('sel');});
+        opt.classList.add('sel');
+        if(seg.getAttribute('data-group')==='theme') applyTheme(opt.getAttribute('data-v'));  // instant preview
+      });
+    });
+    // Update → confirm & go to the matching table (no-op if unchanged from opened mode)
+    updateBtn.addEventListener('click',function(){
+      localStorage.setItem('tgt-smart', chosenSmart());   // rating screen reads this
+      var m=chosenTheme();
+      location.href = m==='light' ? 'concept-table-light.html' : 'concept-table-dark.html';
+    });
+    // Back → return to the table in the mode it was OPENED in (cancel the preview)
+    function goBack(){ location.href = OPENED==='light' ? 'concept-table-light.html' : 'concept-table-dark.html'; }
+    document.querySelectorAll('[data-back]').forEach(function(el){ el.addEventListener('click',goBack); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') goBack(); });
+  })();
+</script>
+</body>
+</html>

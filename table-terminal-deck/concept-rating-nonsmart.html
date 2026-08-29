@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Non-Smart Concept TGT · Rating Detail — Sally May</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Open+Sans:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Concept TGT — Rating Detail (Sally May)  1024×768
+   Decoupled screen. Rebuilt from Figma node 2013:84372.
+   ============================================================ */
+:root{
+  --canvas:#0e0b09; --raised:rgba(255,255,255,.05); --card:rgba(14,12,9,.85);
+  --panel:rgba(8,6,5,.94); --glass:rgba(255,255,255,.1);
+  --primary:#f3efe6; --secondary:#a79f92; --muted:#7a736a; --accent:#ebcf8b;
+  --positive:#4bd07a; --negative:#e85a6b; --info:#5aa8e8; --warning:#e0b64d;
+  --gold:#cea02c; --blue:#5aa8e8; --purple:#a66be8; --n09:#fdfdfd;
+  --e1:0 2px 4px rgba(0,0,0,.1); --e2:0 4px 12px rgba(0,0,0,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{width:100vw;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:#000;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--primary)}
+.ui-root{position:relative;width:1024px;height:768px;overflow:hidden;background:#000}
+img.i{display:block;width:100%;height:100%}
+
+/* the actual landing page (dark table) rendered behind, dimmed & non-interactive */
+#bg-table{position:absolute;inset:0;width:1024px;height:768px;border:0;z-index:1;pointer-events:none}
+/* dark scrim over the table, behind the rating panel */
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:5}
+
+/* ---------- RATING PANEL (960×576 centered) ---------- */
+.rpanel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:960px;height:672px;z-index:10;
+  background:#0b0908;border-radius:18px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--glass),0 40px 90px -24px rgba(0,0,0,.78);
+  display:flex;flex-direction:column}
+
+/* header row */
+.rd-head{flex:none;height:64px;display:flex;align-items:center;gap:12px;padding:0 16px;background:var(--panel);box-shadow:inset 0 -1px var(--glass)}
+.rd-ex{flex:none;width:56px;height:44px;border:none;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;
+  background:rgba(232,90,107,.08);box-shadow:inset 0 0 0 1px rgba(232,90,107,.5);color:var(--negative);font-size:12px;font-weight:800;letter-spacing:.5px;transition:background .15s,box-shadow .15s}
+.rd-ex b{font-size:15px;font-weight:800}
+.rd-ex:hover{background:rgba(232,90,107,.14)}
+.ui-root.ex-open .rd-ex{background:rgba(232,90,107,.2);box-shadow:inset 0 0 0 1.5px var(--negative)}
+
+/* EXCLUSION CARD — inline first column of the modal body, revealed on EX tap (Figma 2009:118835) */
+.ex-panel{flex:none;width:0;overflow:hidden;align-self:flex-start;
+  background:var(--raised);box-shadow:inset 0 0 0 1px var(--negative),var(--e2);border-radius:12px;
+  opacity:0;transition:width .22s ease,opacity .18s ease,margin .22s ease;margin-right:-14px;padding:0}
+.ui-root.ex-open .ex-panel{width:219px;opacity:1;margin-right:0;padding:13px 15px}
+.ex-panel .ex-inner{width:189px}
+.ex-panel .ex-hd{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.ex-panel .ex-dot{width:9px;height:9px;border-radius:50%;background:var(--negative);flex:none}
+.ex-panel .ex-score{font-size:16px;font-weight:800;letter-spacing:.3px;color:var(--primary)}
+.ex-panel .ex-body{font-size:14px;font-weight:500;line-height:1.45;color:var(--secondary)}
+.rd-ava{flex:none;width:52px;height:52px;border-radius:12px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--glass)}
+.rd-ava img{width:100%;height:100%;object-fit:cover;display:block}
+.rd-seat{flex:none;font-size:13px;font-weight:800;letter-spacing:.5px;color:var(--primary);background:rgba(255,255,255,.07);
+  box-shadow:inset 0 0 0 1px var(--glass);border-radius:8px;padding:5px 11px}
+.rd-name{font-size:15px;font-weight:800;letter-spacing:.6px;color:var(--info);white-space:nowrap}
+.rd-pid{font-size:12px;font-weight:700;letter-spacing:.4px;color:var(--info);white-space:nowrap;margin-left:-4px}
+.rd-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.8px;border-radius:8px;padding:5px 10px}
+.rd-pill svg{width:13px;height:13px}
+.rd-pill.rolling{color:#8fc8f5;background:rgba(90,168,232,.14);box-shadow:inset 0 0 0 1px rgba(90,168,232,.6)}
+.rd-pill.card{color:#5ad9d0;background:rgba(90,217,208,.12);box-shadow:inset 0 0 0 1px rgba(90,217,208,.6)}
+.rd-pill.tag{color:#c79bf2;background:rgba(166,107,232,.14);box-shadow:inset 0 0 0 1px rgba(166,107,232,.6)}
+.rd-x{margin-left:auto;flex:none;width:32px;height:32px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.rd-x svg{width:20px;height:20px;stroke:var(--secondary);fill:none;stroke-width:2;stroke-linecap:round}
+
+/* body: RATING SUMMARY | BET SUMMARY | HAND-BY-HAND
+   The WHOLE body scrolls horizontally (swipe the modal) to reveal extra hand columns. */
+.rd-body{flex:1;min-height:0;display:flex;gap:14px;padding:14px 16px;
+  overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scroll-snap-type:none}
+.rd-body::-webkit-scrollbar{height:8px}
+.rd-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:4px}
+.rd-body::-webkit-scrollbar-track{background:rgba(255,255,255,.03)}
+.rd-body>*{flex:0 0 auto}
+.rd-card{background:rgba(255,255,255,.02);box-shadow:inset 0 0 0 1px var(--glass);border-radius:13px;padding:14px 16px;display:flex;flex-direction:column;min-height:0}
+.rd-h{font-size:12px;font-weight:800;letter-spacing:1.2px;color:var(--accent);text-transform:uppercase;margin-bottom:11px;flex:none}
+/* RATING SUMMARY — bare 2-col cells, NO wrapper card/title (per Figma, saves space) */
+.rs{width:192px;flex:none;display:grid;grid-template-columns:1fr 1fr;gap:4px;align-content:start}
+.rs-cell{background:var(--raised);box-shadow:inset 0 0 0 1px var(--glass);border-radius:8px;padding:4px 8px}
+.rs-cell .k{font-size:12px;font-weight:600;color:var(--secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.rs-cell .v{font-size:16px;font-weight:700;color:var(--primary);letter-spacing:.15px;line-height:1.4;white-space:nowrap;font-variant-numeric:tabular-nums}
+.rs-cell .v.neg{color:var(--negative)}
+/* BET SUMMARY */
+.bs{width:300px;flex:none}
+.bs-row{display:grid;grid-template-columns:1fr 82px 54px 66px;align-items:center;gap:8px;height:29px;
+  font-variant-numeric:tabular-nums;box-shadow:inset 0 -1px rgba(255,255,255,.04)}
+.bs-row .l{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--secondary);white-space:nowrap;min-width:0}
+.bs-row .l i{width:8px;height:8px;border-radius:2px;flex:none;background:var(--dot,var(--muted))}
+.bs-row .v{font-size:14px;font-weight:800;text-align:right;color:var(--primary)}
+.bs-row .c{font-size:12px;font-weight:700;text-align:right;color:var(--muted)}
+.bs-row .a{font-size:13px;font-weight:700;text-align:right;color:var(--secondary)}
+.bs-row.hd{height:24px;box-shadow:inset 0 -1px var(--glass)}
+.bs-row.hd span{font-size:10px;font-weight:800;letter-spacing:.7px;color:var(--muted);text-transform:uppercase;text-align:right}
+.bs-row.hd .l{justify-content:flex-start}
+.bs-row.sum{height:32px;box-shadow:inset 0 1.5px rgba(255,255,255,.26),inset 0 -1.5px rgba(255,255,255,.26);margin:2px 0}
+.bs-row.sum .l{color:var(--primary);font-weight:800}
+.bs-row.sum .v{color:var(--accent)}
+/* HAND-BY-HAND — fixed wide column; the OUTER modal body scrolls horizontally to reveal it */
+.rd-hh{flex:none;width:626px;background:rgba(255,255,255,.02);box-shadow:inset 0 0 0 1px var(--glass);border-radius:13px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.rd-hh .gh{flex:none;height:40px;display:flex;align-items:center;gap:12px;padding:0 14px;background:rgba(255,255,255,.03);box-shadow:inset 0 -1px var(--glass)}
+.rd-hh .gh .t{font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--primary);white-space:nowrap}
+.rd-hh .gh .swipe{margin-left:auto;font-size:9px;font-weight:800;letter-spacing:.6px;color:var(--muted);white-space:nowrap}
+/* wide grid: Hand · Time · Free · Player · Banker · Tie · Tiger · T·Pair · S·Tiger · Big Tiger */
+.hhg{display:grid;grid-template-columns:34px 56px 68px 74px 74px 60px 62px 66px 66px 66px;align-items:center;
+  font-variant-numeric:tabular-nums;padding:0 12px;gap:4px}
+.hhg>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hhg .r{text-align:right}
+.hhc-head{flex:none;height:32px;box-shadow:inset 0 -1px var(--glass)}
+.hhc-head span{font-size:10px;font-weight:800;letter-spacing:.3px;color:var(--muted);text-transform:uppercase;line-height:32px}
+.hhc-tot{flex:none;height:30px;background:rgba(255,255,255,.04)}
+.hhc-tot span{font-size:13px;font-weight:800;line-height:30px;color:var(--primary)}
+.rd-hh-body{overflow-y:auto;overflow-x:hidden;flex:1;min-height:0}
+.rd-hh-body::-webkit-scrollbar{width:6px}.rd-hh-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.13);border-radius:3px}
+.hh2{height:29px;box-shadow:inset 0 -1px rgba(255,255,255,.045)}
+.hh2 span{font-size:13px;font-weight:700;line-height:29px}
+.hh2 .no{color:var(--secondary)}.hh2 .tm{color:var(--muted);font-size:12px}
+.hh2 .free{color:var(--secondary)}.hh2 .pl{color:var(--blue)}.hh2 .bk{color:var(--accent)}.hh2 .sd{color:#c79bf2}
+
+/* ---------- NON-SMART (smart table OFF) body: type grid | bet cards | notes ---------- */
+.rs-nonsmart{width:294px}
+/* bet cards column (Figma: 318px wide, 64px rows) */
+.bgs{width:318px;flex:none;display:flex;flex-direction:column;gap:8px;align-content:start}
+.bg-card{width:318px;background:var(--raised);border:1px solid var(--glass);border-radius:12px;overflow:hidden;flex:none}
+.bg-top{height:64px;display:flex;align-items:center;gap:10px;padding:0 17px}
+.bg-top .dot{width:12px;height:12px;border-radius:4px;background:var(--warning);flex:none}
+.bg-top .nm{font-size:14px;font-weight:700;letter-spacing:.3px;color:var(--primary);white-space:nowrap}
+.bg-top .amt{margin-left:auto;font-size:18px;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums}
+.bg-pace{height:64px;border-top:1px solid var(--glass);display:flex}
+.pace{flex:1;background:none;border:0;cursor:pointer;font-family:inherit;font-size:16px;font-weight:700;
+  color:var(--secondary);letter-spacing:.2px;border-radius:8px;transition:color .15s,box-shadow .15s,background .15s}
+.pace.sel{color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent);background:rgba(235,207,139,.06)}
+/* notes column */
+.notes{width:288px;flex:0 0 auto;display:flex;flex-direction:column;gap:14px;align-content:start}
+.nt{display:flex;flex-direction:column;gap:3px}
+.nt-l{font-family:'Open Sans',Inter,sans-serif;font-size:14px;font-weight:700;letter-spacing:.17px;color:var(--secondary)}
+.nt-box{height:64px;background:var(--raised);border:1px solid var(--glass);border-radius:12px;
+  padding:8px 12px;font-size:14px;font-weight:500;color:var(--primary);outline:none;overflow:hidden}
+.nt-box:focus{border-color:rgba(235,207,139,.55)}
+
+#keypad{flex:0 0 auto;width:0;align-self:flex-start;height:483px;overflow:hidden;
+  background:rgba(255,255,255,.04);border:1px solid transparent;border-radius:12px;
+  display:flex;gap:8px;padding:0;opacity:0;pointer-events:none;
+  transition:width .3s cubic-bezier(.22,1,.36,1),opacity .2s ease,padding .3s,border-color .3s,margin .3s;margin-right:-14px}
+.ui-root.kp-open #keypad{width:366px;padding:8px;opacity:1;pointer-events:auto;border-color:var(--accent);margin-right:0}
+/* the inner column must not squash while the panel animates open */
+#keypad>*{flex:none}
+#keypad{box-sizing:border-box}
+.kp-main{width:258px}
+/* left area: display + digit grid + +/− + UPDATE */
+.kp-main{min-width:0;display:flex;flex-direction:column}
+.kp-disp{height:78px;flex:none;border-bottom:1px solid rgba(217,178,95,.5);display:flex;flex-direction:column;justify-content:flex-end;padding:8px 6px 8px 4px}
+.kp-disp .lbl{font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--muted);text-transform:uppercase}
+.kp-disp .val{font-size:30px;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums;line-height:1.1}
+/* close button — top-right corner of the whole keypad panel (Figma 2047:102355) */
+.kp-close{position:absolute;right:8px;top:8px;z-index:2;width:48px;height:48px;border:1px solid var(--glass);border-radius:12px;
+  background:var(--raised);box-shadow:var(--e2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--secondary);font-size:16px}
+.kp-grid{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:8px;padding-top:8px}
+.kp-key{border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);border-radius:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;color:var(--primary);user-select:none;transition:background .1s}
+.kp-key:active{background:rgba(255,255,255,.1)}
+.kp-key img{width:24px;height:24px;display:block}
+/* +/− row */
+.kp-pm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;flex:none;height:60px}
+.kp-pm .k{border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.kp-pm .k img{width:24px;height:24px}
+.kp-pm .plus{background:rgba(217,119,95,.14);border:1px solid rgba(217,119,95,.5)}
+.kp-pm .minus{background:rgba(103,217,95,.14);border:1px solid rgba(103,217,95,.5)}
+.kp-update{margin-top:8px;flex:none;height:60px;border-radius:9px;cursor:pointer;
+  background:rgba(217,178,95,.14);border:1px solid rgba(217,178,95,.5);transition:background .15s,box-shadow .15s;
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;letter-spacing:.8px;color:var(--accent)}
+.kp-update:active{background:rgba(217,178,95,.24)}
+.kp-update.done{background:rgba(88,217,122,.2);border-color:rgba(88,217,122,.6);box-shadow:0 0 0 2px rgba(88,217,122,.18)}
+/* right area: quick-add pills — start below the ✕ button in the top-right */
+.kp-quick{width:84px;flex:none;display:flex;flex-direction:column;gap:8px;padding-top:56px}
+.kp-q{flex:1;border-radius:12px;cursor:pointer;background:rgba(217,178,95,.14);border:1px solid rgba(219,183,106,.54);
+  display:flex;align-items:center;justify-content:center;font-weight:600;font-size:20px;color:var(--accent);user-select:none}
+/* keypad lives inside the rating body; the notes column slides right behind it */
+.rd-body{position:relative}
+.ui-root.kp-open .notes{width:0;opacity:0;overflow:hidden;margin-left:-14px}
+/* make room for the 366px keypad inside the 928px body: the reference grid and the
+   bet-card column both give a little, so nothing overflows the panel */
+.ui-root.kp-open .rs-nonsmart{width:250px}
+.ui-root.kp-open .bgs{width:284px}
+.ui-root.kp-open .bg-card{width:284px}
+.rs-nonsmart,.bgs,.bg-card{transition:width .3s cubic-bezier(.22,1,.36,1)}
+.notes{transition:width .3s cubic-bezier(.22,1,.36,1),opacity .2s ease,margin .3s}
+/* the bet card being edited gets the gold active ring */
+.bg-card.kp-active{box-shadow:0 0 0 1.5px var(--accent)}
+
+/* ---------- BTN BAR (panel footer — centered 759px, per Figma 2012:94068) ---------- */
+#btnbar{flex:none;width:759px;margin:0 auto;padding:8px 10px 10px}
+.btnbar-inner{background:var(--panel);border:1px solid rgba(255,255,255,.2);border-radius:16px;height:80px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.bb-group{display:flex;gap:10px;align-items:center}
+.bb-item{display:flex;align-items:center;gap:8px;padding:4px;cursor:pointer;background:none;border:none}
+.bb-ic{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:var(--e2);flex:none}
+.bb-ic img{width:24px;height:24px;display:block}
+.bb-ic.pause{background:var(--info)}
+.bb-ic.cancel{background:var(--warning)}
+.bb-ic.exchange{background:#c874d9}
+.bb-ic.close{background:#4ea86b}
+.bb-l{font-family:'Open Sans';font-weight:700;font-size:16px;letter-spacing:.15px;color:var(--primary);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="ui-root">
+  <!-- the landing page (dark table) shown behind the rating panel -->
+  <iframe id="bg-table" src="concept-table-dark.html" scrolling="no" tabindex="-1" aria-hidden="true"></iframe>
+  <div class="scrim" data-back></div>
+
+  <div class="rpanel">
+    <!-- header -->
+    <div class="rd-head">
+      <button class="rd-ex" id="ex-btn" aria-label="Exclusion details">EX <b>1</b></button>
+      <span class="rd-ava"><img src="assets/concept-dark/rating/av_sally.png" alt=""></span>
+      <span class="rd-seat">2-4</span>
+      <span class="rd-name">Sally May</span>
+      <span class="rd-pid">P-1042887</span>
+      <span class="rd-pill rolling">ROLLING</span>
+      <span class="rd-pill card"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="12" rx="2" stroke="#5ad9d0" stroke-width="2"/><path d="M3 10h18" stroke="#5ad9d0" stroke-width="2"/></svg>DIAMOND 3</span>
+      <span class="rd-pill tag">FOREIGNER</span>
+    </div>
+
+    <div class="rd-body">
+      <!-- EXCLUSION CARD — inline first column, revealed on EX tap (Figma 2009:118835) -->
+      <div class="ex-panel" id="ex-panel">
+        <div class="ex-inner">
+          <div class="ex-hd"><span class="ex-dot"></span><span class="ex-score">95</span></div>
+          <div class="ex-body">Allow to Play - Yes &gt;&gt;&gt; Proceed with Rating - Yes &gt;&gt;&gt; Inform CCTV - No &gt;&gt;&gt; Inform Marketing - No</div>
+        </div>
+      </div>
+
+      <!-- RATING TYPE GRID — 2 cols × 8 (Figma 2047:106319) -->
+      <div class="rs rs-nonsmart">
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+        <div class="rs-cell"><div class="k">Rating Type</div><div class="v">Mass</div></div>
+      </div>
+
+      <!-- BET CARDS — manual pace entry, no smart-table feed (Figma 2014:91446/91467/91488) -->
+      <div class="bgs">
+        <div class="bg-card">
+          <div class="bg-top"><span class="dot"></span><span class="nm">MAIN · DEFAULT</span><span class="amt">$2,500</span></div>
+          <div class="bg-pace"><button class="pace" data-v="slow">SLOW</button><button class="pace" data-v="medium">MEDIUM</button><button class="pace sel" data-v="fast">FAST</button></div>
+        </div>
+        <div class="bg-card">
+          <div class="bg-top"><span class="dot"></span><span class="nm">MAIN · ACTUAL</span><span class="amt">$2,500</span></div>
+          <div class="bg-pace"><button class="pace" data-v="slow">SLOW</button><button class="pace" data-v="medium">MEDIUM</button><button class="pace sel" data-v="fast">FAST</button></div>
+        </div>
+        <div class="bg-card">
+          <div class="bg-top"><span class="dot"></span><span class="nm">SIDE · SIDE BET</span><span class="amt">$2,500</span></div>
+          <div class="bg-pace"><button class="pace" data-v="slow">SLOW</button><button class="pace" data-v="medium">MEDIUM</button><button class="pace sel" data-v="fast">FAST</button></div>
+        </div>
+      </div>
+
+
+      <div id="keypad">
+      <button class="kp-close" id="kp-close" aria-label="Close">✕</button>
+      <div class="kp-main">
+      <div class="kp-disp">
+      <div class="lbl" id="kp-lbl">DENOM</div>
+      <div class="val" id="kp-val">0</div>
+      </div>
+      <div class="kp-grid">
+      <div class="kp-key" data-d="1">1</div><div class="kp-key" data-d="2">2</div><div class="kp-key" data-d="3">3</div>
+      <div class="kp-key" data-d="4">4</div><div class="kp-key" data-d="5">5</div><div class="kp-key" data-d="6">6</div>
+      <div class="kp-key" data-d="7">7</div><div class="kp-key" data-d="8">8</div><div class="kp-key" data-d="9">9</div>
+      <div class="kp-key" data-d="00">00</div><div class="kp-key" data-d="0">0</div>
+      <div class="kp-key" data-bs><img src="assets/concept-dark/keypad/backspace.svg" alt="backspace"></div>
+      </div>
+      <div class="kp-pm">
+      <div class="k plus" data-step="1"><img src="assets/concept-dark/keypad/add.svg" alt="+"></div>
+      <div class="k minus" data-step="-1"><img src="assets/concept-dark/keypad/remove.svg" alt="−"></div>
+      </div>
+      <div class="kp-update" id="kp-update">UPDATE</div>
+      </div>
+      <div class="kp-quick">
+      <div class="kp-q" data-q="10">10</div>
+      <div class="kp-q" data-q="20">20</div>
+      <div class="kp-q" data-q="40">40</div>
+      <div class="kp-q" data-q="50">50</div>
+      <div class="kp-q" data-q="60">60</div>
+      <div class="kp-q" data-q="100">100</div>
+      </div>
+      </div>
+
+      <!-- NOTES + BET NOTES (Figma 2014:91640 / 2014:91693) -->
+      <div class="notes">
+        <div class="nt"><div class="nt-l">NOTES</div><div class="nt-box" contenteditable="true"></div></div>
+        <div class="nt"><div class="nt-l">BET NOTES</div><div class="nt-box" contenteditable="true"></div></div>
+      </div>
+    </div>
+
+    <!-- BTN BAR (panel footer) -->
+    <div id="btnbar">
+      <div class="btnbar-inner">
+        <div class="bb-group">
+          <button class="bb-item"><span class="bb-ic pause"><img src="assets/concept-dark/rating/btn_pause.svg" alt=""></span><span class="bb-l">Pause</span></button>
+          <button class="bb-item"><span class="bb-ic cancel"><img src="assets/concept-dark/rating/btn_cancel.svg" alt=""></span><span class="bb-l">Cancel</span></button>
+          <button class="bb-item"><span class="bb-ic exchange"><img src="assets/concept-dark/rating/btn_exchange.svg" alt=""></span><span class="bb-l">Exchange</span></button>
+        </div>
+        <div class="bb-group">
+          <button class="bb-item" data-back><span class="bb-ic close"><img src="assets/concept-dark/rating/btn_close.svg" alt=""></span><span class="bb-l">Close</span></button>
+          <button class="bb-item" data-back><span class="bb-ic close"><img src="assets/concept-dark/rating/btn_chip.svg" alt=""></span><span class="bb-l">Close with Chips</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+  // hand-by-hand rows (transcribed from Figma; pattern-continued below the visible range)
+  (function(){
+    // columns: HAND, TIME, FREE, PLAYER, BANKER, TIE, TIGER, T·PAIR, S·TIGER, BIG TIGER
+    var rows=[
+      [56,'8:38 PM','','','$1,525','','$150','','',''],[55,'8:38 PM','','$1,525','','$75','','','',''],[54,'8:37 PM','','$850','','','$150','$50','',''],
+      [53,'8:36 PM','$600','','$1,475','','','','','$300'],[52,'8:35 PM','','','$1,400','','$150','','',''],[51,'8:33 PM','','','$750','$75','','','',''],
+      [50,'8:30 PM','','','$1,725','','$150','','$50',''],[49,'8:29 PM','$600','','$1,900','','','','',''],[48,'8:29 PM','','$1,675','','','$150','','',''],
+      [47,'8:27 PM','$600','','$1,475','$75','','','',''],[46,'8:25 PM','','$1,800','','','','$50','',''],[45,'8:24 PM','$600','','$1,325','','$150','','','$300'],
+      [44,'8:23 PM','','','$1,300','','','','','']
+    ];
+    var times=['8:21 PM','8:20 PM','8:17 PM','8:14 PM','8:14 PM','8:12 PM','8:12 PM','8:09 PM','8:05 PM','8:03 PM','8:01 PM','7:59 PM','7:57 PM','7:55 PM','7:52 PM','7:50 PM','7:48 PM','7:45 PM','7:43 PM','7:41 PM','7:38 PM','7:36 PM','7:34 PM','7:31 PM','7:29 PM','7:27 PM','7:24 PM','7:22 PM','7:20 PM','7:17 PM','7:15 PM','7:13 PM','7:10 PM','7:08 PM','7:06 PM','7:03 PM','7:01 PM','6:59 PM','6:56 PM','6:54 PM','6:52 PM','6:50 PM','6:48 PM'];
+    var mains=['$1,300','$1,450','$1,175','$1,525','$1,250','$900','$1,700','$1,375','$1,050','$1,600'];
+    for(var n=43,idx=0;n>=1;n--,idx++){
+      var bankerSide=(n%2===0), main=mains[idx%mains.length], free=(n%9===0?'$600':'');
+      var tie=(n%7===0?'$75':''), tiger=(n%4===0?'$150':''), tpair=(n%11===0?'$50':''),
+          stiger=(n%13===0?'$50':''), bigtiger=(n%8===0?'$300':'');
+      rows.push([n, times[idx]||'6:0'+(n%10)+' PM', free, bankerSide?'':main, bankerSide?main:'', tie, tiger, tpair, stiger, bigtiger]);
+    }
+    var html=rows.map(function(d){
+      return '<div class="hh2 hhg"><span class="no">'+d[0]+'</span><span class="tm">'+d[1]+'</span>'
+        +'<span class="r free">'+(d[2]||'')+'</span>'
+        +'<span class="r pl">'+(d[3]||'')+'</span>'
+        +'<span class="r bk">'+(d[4]||'')+'</span>'
+        +'<span class="r sd">'+(d[5]||'')+'</span>'
+        +'<span class="r sd">'+(d[6]||'')+'</span>'
+        +'<span class="r sd">'+(d[7]||'')+'</span>'
+        +'<span class="r sd">'+(d[8]||'')+'</span>'
+        +'<span class="r sd">'+(d[9]||'')+'</span></div>';
+    }).join('');
+    var hhb=document.getElementById('hh-body'); if(hhb) hhb.innerHTML=html;
+
+    var root=document.querySelector('.ui-root'), exBtn=document.getElementById('ex-btn');
+    // pace pickers: single-select per card
+    document.querySelectorAll('.bg-pace').forEach(function(seg){
+      seg.addEventListener('click',function(e){
+        var b=e.target.closest('.pace'); if(!b) return;
+        seg.querySelectorAll('.pace').forEach(function(o){o.classList.remove('sel');});
+        b.classList.add('sel');
+      });
+    });
+    function closeScreen(){ location.href='concept-table-dark.html'; }
+
+    // ---------- KEYPAD (ported from smart-sync.html; Figma 2112:70535) ----------
+    // Tap a bet card's amount → the keypad opens in the notes column slot.
+    var kp=document.getElementById('keypad'), kpVal=document.getElementById('kp-val'),
+        kpLbl=document.getElementById('kp-lbl');
+    var kpCard=null, kpEntry='';
+    function fmt(n){ return '$'+(n||0).toLocaleString('en-US'); }
+    function cardAmt(c){ return parseInt((c.querySelector('.amt').textContent||'').replace(/[^0-9]/g,''),10)||0; }
+    function kpShown(){ return kpEntry!=='' ? kpEntry : String(kpCard?cardAmt(kpCard):0); }
+    function kpDraw(){ kpVal.textContent=fmt(parseInt(kpShown(),10)||0); }
+    function openKeypad(card){
+      kpCard=card; kpEntry='';
+      kpLbl.textContent=(card.querySelector('.nm').textContent||'AMOUNT').trim();
+      document.querySelectorAll('.bg-card').forEach(function(c){ c.classList.toggle('kp-active', c===card); });
+      root.classList.add('kp-open'); kpDraw();
+    }
+    function closeKeypad(){ root.classList.remove('kp-open');
+      document.querySelectorAll('.bg-card.kp-active').forEach(function(c){c.classList.remove('kp-active');}); kpCard=null; }
+    // tapping the amount (or its card header) opens the keypad
+    document.querySelectorAll('.bg-card').forEach(function(c){
+      c.querySelector('.bg-top').addEventListener('click',function(){ openKeypad(c); });
+    });
+    kp.querySelectorAll('[data-d]').forEach(function(k){ k.addEventListener('click',function(){
+      var cur=(kpEntry==='' ? '' : kpEntry);
+      kpEntry=(cur+k.getAttribute('data-d')).replace(/^0+(?=\d)/,'').slice(0,7); kpDraw();
+    });});
+    kp.querySelector('[data-bs]').addEventListener('click',function(){
+      var v=kpShown(); v=v.length>1? v.slice(0,-1):'0'; kpEntry=v==='0'?'':v; kpDraw();
+    });
+    kp.querySelectorAll('[data-step]').forEach(function(k){ k.addEventListener('click',function(){
+      var n=Math.max(0,(parseInt(kpShown(),10)||0)+ +k.getAttribute('data-step')); kpEntry=String(n); kpDraw();
+    });});
+    kp.querySelectorAll('[data-q]').forEach(function(k){ k.addEventListener('click',function(){
+      var n=(parseInt(kpShown(),10)||0)+ +k.getAttribute('data-q'); kpEntry=String(n); kpDraw();
+    });});
+    // UPDATE writes the value into the card but keeps the keypad open (only ✕ closes)
+    document.getElementById('kp-update').addEventListener('click',function(){
+      if(!kpCard) return;
+      kpCard.querySelector('.amt').textContent=fmt(parseInt(kpShown(),10)||0);
+      kpEntry='';
+      var b=this; b.classList.add('done'); setTimeout(function(){b.classList.remove('done');},450);
+    });
+    document.getElementById('kp-close').addEventListener('click',closeKeypad);
+
+    // EX badge → toggle the inline exclusion column
+    if(exBtn){exBtn.addEventListener('click',function(e){ e.stopPropagation(); root.classList.toggle('ex-open'); });}
+    // tap empty space (scrim) → close the screen
+    document.querySelectorAll('[data-back]').forEach(function(el){
+      el.addEventListener('click',function(){
+        if(root.classList.contains('kp-open')){ closeKeypad(); return; }   // keypad first
+        closeScreen();
+      });
+    });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ if(root.classList.contains('kp-open')) closeKeypad(); else closeScreen(); } });
+  })();
+</script>
+</body>
+</html>

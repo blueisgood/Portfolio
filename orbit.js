@@ -13,6 +13,8 @@
   const caseLockClose = document.querySelector('#case-lock-close');
   const casePassword = document.querySelector('#case-password');
   const caseLockError = document.querySelector('#case-lock-error');
+  const comingSoon = document.querySelector('#coming-soon');
+  const comingSoonClose = document.querySelector('#coming-soon-close');
   const caseStudy = document.querySelector('#case-study');
   const caseSlide = document.querySelector('#case-slide');
   const caseProject = document.querySelector('#case-project');
@@ -165,6 +167,10 @@
 
   function openCaseStudy(caseId, trigger) {
     if (!caseStudies[caseId]) return;
+    if (caseId === 'smart') {
+      window.location.href = './table-terminal-case-study.html';
+      return;
+    }
     activeCase = caseId;
     caseTrigger = trigger;
     caseStudy.hidden = false;
@@ -190,6 +196,13 @@
   }
 
   function requestCaseStudy(caseId, trigger) {
+    if (caseId !== 'smart') {
+      caseTrigger = trigger;
+      comingSoon.hidden = false;
+      document.body.classList.add('case-open');
+      comingSoonClose.focus();
+      return;
+    }
     if (caseStudiesAreUnlocked()) {
       openCaseStudy(caseId, trigger);
       return;
@@ -208,6 +221,14 @@
     document.body.classList.remove('lock-open');
     pendingCase?.trigger.focus();
     pendingCase = null;
+  }
+
+  function closeComingSoon() {
+    if (comingSoon.hidden) return;
+    comingSoon.hidden = true;
+    document.body.classList.remove('case-open');
+    caseTrigger?.focus();
+    caseTrigger = null;
   }
 
   function closeCaseStudy() {
@@ -311,10 +332,15 @@
     if (unlockedCase) openCaseStudy(unlockedCase.caseId, unlockedCase.trigger);
   });
   caseLockClose.addEventListener('click', closeCaseLock);
+  comingSoonClose.addEventListener('click', closeComingSoon);
   caseClose.addEventListener('click', closeCaseStudy);
   casePrevious.addEventListener('click', () => updateCaseSlide(activeSlide - 1));
   caseNext.addEventListener('click', () => updateCaseSlide(activeSlide + 1));
   addEventListener('keydown', (event) => {
+    if (!comingSoon.hidden) {
+      if (event.key === 'Escape') closeComingSoon();
+      return;
+    }
     if (!caseLock.hidden) {
       if (event.key === 'Escape') closeCaseLock();
       return;

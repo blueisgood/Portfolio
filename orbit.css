@@ -53,6 +53,15 @@ button { border: 0; }
 .card-label { position:absolute; z-index:3; left:14px; top:13px; display:flex; justify-content:space-between; width:calc(100% - 28px); align-items:start; }
 .card-label i { font:7px monospace; font-style:normal; opacity:.55; }.card-label b { text-align:right; font-size:clamp(14px,1.55vw,23px); line-height:.9; letter-spacing:-.06em; font-weight:500; }
 .card-label.light { color:white; }.card-corner { position:absolute; z-index:3; left:14px; bottom:12px; font:6px monospace; letter-spacing:.12em; }.card-corner.light { color:white; }
+.project-status { position:absolute; z-index:5; right:12px; bottom:10px; padding:4px 7px; border:1px solid rgba(255,255,255,.2); border-radius:999px; color:rgba(255,255,255,.72); background:rgba(10,10,10,.42); font:600 6px/1 monospace; letter-spacing:.08em; text-transform:uppercase; backdrop-filter:blur(8px); }
+.project-status--live { color:#101510; border-color:rgba(196,255,125,.65); background:#c4ff7d; }
+.coming-soon[hidden] { display:none; }
+.coming-soon { position:fixed; inset:0; z-index:80; display:grid; place-items:center; padding:24px; background:rgba(7,8,8,.72); backdrop-filter:blur(18px); }
+.coming-soon__panel { position:relative; width:min(520px,100%); padding:48px; border:1px solid rgba(255,255,255,.14); border-radius:24px; color:var(--ink); background:#121313; box-shadow:0 32px 100px rgba(0,0,0,.5); }
+.coming-soon__panel button { position:absolute; top:16px; right:16px; width:42px; height:42px; padding:0 0 3px; display:grid; place-items:center; border:0; border-radius:50%; color:var(--ink); background:rgba(255,255,255,.08); cursor:pointer; font-size:30px; font-weight:300; line-height:1; }
+.coming-soon__panel p { margin:0 0 18px; color:var(--accent); font:10px monospace; letter-spacing:.12em; text-transform:uppercase; }
+.coming-soon__panel h2 { margin:0; font-size:clamp(42px,6vw,72px); line-height:.92; letter-spacing:-.06em; }
+.coming-soon__panel span { display:block; margin-top:24px; color:var(--muted); font-size:14px; }
 
 .card-smart .card-front { background:#a59aff; }
 .smart-visual { position:absolute; left:50%; top:56%; width:54%; height:45%; border:1px solid #111; border-radius:48% 48% 30% 30%; transform:translate(-50%,-50%) rotate(-6deg); background:#252231; box-shadow:0 18px 24px rgba(31,19,85,.35); }

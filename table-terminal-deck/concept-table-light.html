@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept TGT · Baccarat Table (Light)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Open+Sans:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Concept TGT — Baccarat Table View (LIGHT)  1024×768
+   Rebuilt 1:1 from Figma node 2004:66392.
+   Every node keeps its Figma absolute px position inside .ui-root.
+   ============================================================ */
+:root{
+  --canvas:#f9f3ee;
+  --raised:rgba(255,255,255,.7);
+  --card:rgba(255,255,255,.85);
+  --glass:rgba(255,255,255,.75);
+  --seat-white:#ffffff;
+  --primary:#1b1b1b;
+  --secondary:#8d8f95;
+  --muted:#a6a7ae;
+  --accent:#ca981e;          /* seat label gold (occupied/others) */
+  --accent-live:#ebcf8b;     /* accent on dark */
+  --positive:#38c269;
+  --negative:#e85a6b;
+  --chip-gold:#cea02c;
+  --chip-blue:#4c9cdd;
+  --chip-dark:#1b1b1b;
+  --n09:#fdfdfd;
+  --e1:0 2px 4px rgba(0,0,0,.1);      /* Elevation/01 */
+  --e2:0 4px 12px rgba(0,0,0,.1);     /* Elevation/02 */
+  --e-soft:0 4px 6px rgba(0,0,0,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  width:100vw;height:100vh;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:#e9e2db;
+  font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;color:var(--primary);
+}
+.ui-root{
+  position:relative;width:1024px;height:768px;overflow:hidden;
+  background:radial-gradient(ellipse 54% 59% at 50% 59%,#fbf9f5 0%,#f8f1ee 55%,#f6f1ed 100%);
+}
+.op{font-family:'Open Sans',sans-serif}
+img.i{display:block;width:100%;height:100%}
+
+/* ---------- GLOBAL BAR (64px) ---------- */
+#gbar{position:absolute;left:0;top:0;width:1024px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:30}
+.gbar-l{display:flex;align-items:center;gap:12px}
+.iconbtn{background:var(--raised);border:1px solid var(--glass);border-radius:16px;
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--e2)}
+.iconbtn.sq{width:48px;height:48px}
+.iconbtn.sq .g{width:19px;height:19px}
+.tid{background:var(--raised);border:1px solid var(--glass);border-radius:16px;height:48px;
+  display:flex;align-items:center;gap:4px;padding:0 12px;box-shadow:var(--e1)}
+.tid .dot{width:8px;height:8px;border-radius:50%;background:var(--positive)}
+.tid .nm{font-weight:800;font-size:18px;letter-spacing:0;color:var(--primary)}
+.warnbtn{padding:12px;border-radius:16px;display:flex;align-items:center}
+.warnbtn .g{width:24px;height:24px}
+.gbar-r{display:flex;align-items:center;gap:12px;justify-content:flex-end}
+.gbar-r .g24{width:24px;height:24px}
+.gbar-r .g24box{width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.gbar-r .g16{width:16px;height:16px}
+.pillbtn .gmoney{width:15px;height:15px;object-fit:contain}
+.datetxt{font-weight:600;font-size:16px;color:var(--primary);white-space:nowrap}
+.datetxt.mono{white-space:pre}
+.pillbtn{background:var(--raised);border:1px solid var(--glass);border-radius:16px;
+  display:flex;align-items:center;gap:12px;padding:12px;box-shadow:var(--e2)}
+.pillbtn .g24{width:24px;height:24px}
+.pillbtn .t{font-weight:700;font-size:16px;color:var(--primary);white-space:nowrap}
+.badgebtn{position:relative}
+.badge{position:absolute;left:26px;top:3px;min-width:18px;height:18px;padding:0 4px;border-radius:43px;
+  background:var(--negative);display:flex;align-items:center;justify-content:center;
+  font-family:'Open Sans';font-weight:700;font-size:12px;line-height:1;color:var(--n09)}
+
+/* ---------- ALERT STRIP (top:64) — horizontally scrollable ---------- */
+#alerts{position:absolute;left:2px;top:64px;width:1020px;padding:8px 12px;z-index:20;
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#alerts::-webkit-scrollbar{display:none}
+.alert-row{display:flex;gap:12px;align-items:center;width:max-content;padding-right:12px}
+.acard{background:var(--card);border:1px solid var(--glass);border-radius:12px;box-shadow:var(--e2);
+  height:86px;padding:13px 15px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden}
+.acard .top{display:flex;align-items:center;justify-content:space-between;width:100%}
+.acard .lt{display:flex;align-items:center;gap:7px}
+.acard .adot{width:9px;height:9px;border-radius:50%;flex:none}
+.acard .ttl{font-weight:800;font-size:16px;letter-spacing:.3px;color:var(--primary);white-space:nowrap}
+.acard .time{font-weight:500;font-size:12px;color:var(--muted);text-align:right;width:50px}
+.acard .body{font-weight:500;font-size:14px;line-height:1.45;color:var(--secondary);margin-top:4px}
+
+/* ---------- GRID VIEW floating (top:177, right) ---------- */
+#gridview{position:absolute;left:934px;top:177px;width:80px;height:68px;z-index:15;
+  background:var(--raised);border:1px solid var(--glass);border-radius:12px;box-shadow:var(--e-soft);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+#gridview .g{width:20px;height:20px}
+#gridview .l{font-family:'Open Sans';font-weight:700;font-size:9px;line-height:1.5;color:var(--secondary);text-align:center}
+
+/* ---------- FELT + center info (BaccaratLight left:152 top:226 w:731 h:466) ---------- */
+#felt-wrap{position:absolute;left:152px;top:226px;width:731px;height:466px;z-index:5}
+#felt{position:absolute;left:0;top:33px;width:730px;height:466px;object-fit:contain;pointer-events:none}
+/* tinfo: REQ / INVENTORY  (left:288 top:295 within wrap) */
+#tinfo{position:absolute;left:288px;top:295px;width:163px;height:40px;display:flex;gap:26px;
+  align-items:flex-start;justify-content:center}
+#tinfo .col{display:flex;flex-direction:column;gap:3px;align-items:center}
+#tinfo .k{font-weight:800;font-size:9px;letter-spacing:1px;color:var(--muted)}
+#tinfo .reqrow{display:flex;gap:4px;align-items:center}
+#tinfo .reqrow .g{width:13px;height:13px}
+#tinfo .reqv{font-weight:800;font-size:15px;color:var(--positive)}
+#tinfo .invv{font-weight:800;font-size:15px;color:var(--primary)}
+/* dealer/supervisor card (left:288 top:342) */
+#dealer{position:absolute;left:288px;top:342px;width:163px;height:75px;
+  background:var(--card);border:1px solid var(--glass);border-radius:12px;box-shadow:var(--e2);
+  display:flex;gap:10px;align-items:center;justify-content:center;padding:8px 16px}
+#dealer .col{display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;width:60px}
+#dealer .id{font-weight:800;font-size:12px;letter-spacing:1px;color:var(--muted)}
+#dealer .g{width:17px;height:17px}
+#dealer .nm{font-weight:800;font-size:14px;color:var(--primary)}
+
+/* ---------- SEATS GROUP (left:84 top:384 w:864 h:212) ---------- */
+#seats{position:absolute;left:84px;top:384px;width:864px;height:212px;z-index:10}
+.seat{position:absolute;width:80px;height:92px}
+.seat .card{position:absolute;left:0;top:0;width:80px;height:80px;border-radius:12px;
+  background:var(--seat-white);border:1px solid var(--glass);box-shadow:var(--e-soft)}
+.seat .add{position:absolute;left:27px;top:27px;width:24px;height:24px;overflow:hidden}
+.seat .add .g{position:absolute;inset:12.5%;width:75%;height:75%}
+.seat .lbl{position:absolute;left:16px;top:68px;width:48px;height:24px;border-radius:8px;
+  background:var(--seat-white);border:1px solid var(--glass);box-shadow:var(--e-soft);
+  display:flex;align-items:center;justify-content:center}
+.seat .lbl b{font-family:'Open Sans';font-weight:700;font-size:18px;line-height:1;color:var(--accent)}
+
+/* occupied seat 2-1 (rating stack) */
+.seat.occ{width:80px;height:161px}
+.seat.occ .chip{position:absolute;left:0;width:80px;height:39px;border-radius:12px 12px 0 0;
+  border:1px solid var(--glass);box-shadow:var(--e-soft)}
+.seat.occ .chip .dm{position:absolute;left:8px;top:8px;width:14px;height:14px;overflow:hidden}
+.seat.occ .chip .dm .g{position:absolute;inset:12.5% 9.9% 16.25% 9.9%}
+.seat.occ .chip .v{position:absolute;left:30px;top:8px;font-family:'Open Sans';font-weight:600;
+  font-size:14px;line-height:1.286;letter-spacing:.17px;color:var(--n09)}
+.seat.occ .chip.c1{top:4px;background:var(--chip-gold)}
+.seat.occ .chip.c2{top:29px;background:var(--chip-blue)}
+.seat.occ .chip.c3{top:55px;background:var(--chip-dark)}
+.seat.occ .chip.c3 .v{left:34.5px}
+.seat.occ .reddot{position:absolute;left:58px;top:12px;width:12px;height:12px}
+.seat.occ .big{position:absolute;left:0;top:80px;width:80px;height:69px;border-radius:12px;
+  background:var(--seat-white);border:1px solid var(--glass);box-shadow:var(--e-soft);
+  display:flex;align-items:center;justify-content:center}
+.seat.occ .big b{font-family:'Open Sans';font-weight:700;font-size:36px;line-height:1;color:var(--secondary)}
+.seat.occ .lbl{top:136px}
+
+/* ---------- BOTTOM ACTION BAR (top:684) ---------- */
+#abar{position:absolute;left:0;top:684px;width:1024px;padding:8px 12px;z-index:30;
+  display:flex;align-items:center;justify-content:space-between}
+.aitem{background:var(--raised);border:1px solid var(--glass);border-radius:12px;
+  width:80px;height:68px;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.aitem.active{border-color:var(--positive);box-shadow:var(--e2)}
+.aitem .g{width:20px;height:20px;margin-bottom:2px}
+.aitem .ico{width:38px;height:38px;display:flex;align-items:center;justify-content:center}
+.aitem .l{font-family:'Open Sans';font-weight:700;font-size:9px;line-height:1.5;text-align:center;color:var(--secondary)}
+.aitem.active .l{color:var(--positive)}
+.arow{display:flex;gap:10px;align-items:center}
+.aover{width:48px;height:68px;display:flex;align-items:center;justify-content:center}
+.aover .box{background:var(--raised);border:1px solid var(--glass);border-radius:8px;width:48px;height:60px;
+  display:flex;align-items:center;justify-content:center}
+.aover .g{width:16px;height:16px}
+#ov-toggle{cursor:pointer}
+#ov-toggle .g{transition:transform .2s ease}
+.ui-root.ov-open #ov-toggle .g{transform:rotate(180deg)}
+/* ---------- SECOND ACTION ROW (full-width panel above main bar, right-aligned) ---------- */
+#abar2{position:absolute;left:0;top:600px;width:1024px;padding:8px 12px;z-index:28;
+  display:flex;align-items:center;justify-content:flex-end;
+  background:var(--canvas);box-shadow:0 -1px 0 var(--glass);
+  opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .2s ease,transform .2s ease}
+.ui-root.ov-open #abar2{opacity:1;pointer-events:auto;transform:translateY(0)}
+.arow2{display:flex;gap:10px;align-items:center}
+
+/* ---------- CARD RAIL (overlay state) — light theme (Figma 2007:110198) ---------- */
+.seat.occ{cursor:pointer}
+/* z-index registry: chrome (gbar/abar) 30 · scrim 35 (dims chrome too) · rail 40 · context menu 45 */
+#rail-scrim{position:absolute;inset:0;z-index:35;background:rgba(0,0,0,.28);
+  opacity:0;pointer-events:none;transition:opacity .22s ease}
+.ui-root.rail-open #rail-scrim{opacity:1;pointer-events:auto}
+#cardrail{position:absolute;left:118px;top:106px;width:224px;z-index:40;
+  display:flex;flex-direction:column;padding:8px;border-radius:16px;
+  background:rgba(249,243,238,.94);backdrop-filter:blur(7.55px);-webkit-backdrop-filter:blur(7.55px);
+  box-shadow:0 12px 40px -12px rgba(0,0,0,.35);
+  opacity:0;pointer-events:none;transform:translateX(-12px);transition:opacity .22s ease,transform .22s ease}
+.ui-root.rail-open #cardrail{opacity:1;pointer-events:auto;transform:translateX(0)}
+/* patron card — OCCUPIED cards stay DARK even in light mode (per Figma surface/card) */
+.pcard{position:relative;width:200px;margin:4px 0;border-radius:12px;padding:4px;cursor:pointer;
+  background:#231f1c;border:1px solid rgba(255,255,255,.1);box-shadow:var(--e1)}
+.pcard.empty{height:100px;background:var(--raised);border:1px solid var(--glass);
+  display:flex;align-items:center;justify-content:center}
+.pcard .ph{width:32px;height:32px;object-fit:contain;opacity:.9}
+.pcard .ph.person{width:auto;height:34px}
+.pcard .chip4{position:absolute;left:7px;top:6px;min-width:36px;height:24px;padding:0 8px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  font-family:'Open Sans';font-weight:700;font-size:14px;letter-spacing:.17px;color:#f3efe6}
+/* empty-card chip reads on white → dark text + light surface */
+.pcard.empty .chip4{background:var(--raised);border:1px solid var(--glass);color:var(--primary)}
+.pcard .chip4.bl{left:8px;top:auto;bottom:8px}
+/* top row: chip + name pill + alert pills */
+.pc-top{display:flex;gap:4px;align-items:center;width:100%}
+.pc-top .chip4{position:static;flex:none}
+.namepill{flex:1;min-width:0;height:24px;padding:0 6px;border-radius:8px;display:flex;align-items:center;
+  font-family:'Open Sans';font-weight:700;font-size:14px;letter-spacing:.17px;color:#f3efe6;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.namepill.gold{background:#cea02c}
+.namepill.blue{background:#5aa8e8}
+.namepill.dark{background:#1b1b1b}
+.alertpill{flex:none;height:24px;padding:0 8px;border-radius:8px;display:flex;align-items:center;
+  background:rgba(232,90,107,.12);border:1px solid rgba(232,90,107,.6);
+  font-weight:800;font-size:12px;color:var(--negative)}
+/* body: avatar + stats */
+.pc-body{display:flex;gap:4px;align-items:flex-start;margin-top:4px}
+.pc-body .avatar{width:64px;height:64px;border-radius:8px;object-fit:cover;flex:none;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.pc-stats{display:flex;flex-direction:column;gap:4px;height:64px}
+.pc-stats .rrow{display:flex;align-items:center;gap:2px;font-family:'Inter';font-weight:600;font-size:14px;
+  letter-spacing:.17px;color:#a79f92}
+.pc-stats .rrow .dm{width:14px;height:14px;margin-right:2px}
+.pc-stats .amt{font-weight:700;font-size:14px;color:#7a736a}
+.pc-stats .net{font-weight:800;font-size:14px;color:#58d97a}
+/* empty 2-1 card selected → gold border + gold tint (per Figma) */
+.pcard.empty.sel-seat{cursor:pointer}
+.ui-root.menu-open .pcard.sel-seat.selected{border:1px solid var(--accent);background:rgba(202,152,30,.12)}
+.ui-root.menu-open .pcard.sel-seat.selected .chip4{background:rgba(202,152,30,.12)}
+/* ---------- CONTEXT MENU (sub-state) ---------- */
+#ctxmenu{position:absolute;left:362px;top:496px;z-index:45;
+  display:flex;flex-direction:column;gap:10px;padding:10px;border-radius:16px;
+  background:rgba(255,255,255,.9);backdrop-filter:blur(7.25px);-webkit-backdrop-filter:blur(7.25px);
+  border:1px solid rgba(0,0,0,.08);box-shadow:0 8px 24px -8px rgba(0,0,0,.28);
+  opacity:0;pointer-events:none;transform:translateY(6px) scale(.98);transform-origin:top left;
+  transition:opacity .18s ease,transform .18s ease}
+.ui-root.menu-open #ctxmenu{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
+.ctx-item{display:flex;align-items:center;gap:8px;padding:4px;border:none;background:none;cursor:pointer}
+.ctx-ic{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--e2);flex:none}
+.ctx-ic img{width:24px;height:24px;display:block}
+.ctx-ic.brass{background:#d99d1f}
+.ctx-ic.orange{background:#e97f46}
+.ctx-ic.purple{background:#ac49ee}
+.ctx-l{font-family:'Open Sans';font-weight:700;font-size:16px;letter-spacing:.15px;color:var(--primary);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="ui-root">
+
+  <!-- ============ GLOBAL BAR ============ -->
+  <div id="gbar">
+    <div class="gbar-l">
+      <div class="iconbtn sq"><img class="g i" src="assets/concept/menu.svg" alt=""></div>
+      <div class="tid"><span class="dot"></span><span class="nm">MD88012</span></div>
+      <div class="warnbtn"><img class="g i" src="assets/concept/warn.svg" alt=""></div>
+    </div>
+    <div class="gbar-r">
+      <span class="g24box"><img class="g16 i" src="assets/concept/card.svg" alt=""></span>
+      <span class="datetxt">25/06/2026</span>
+      <span class="g24box"><img class="g16 i" src="assets/concept/calendar.svg" alt=""></span>
+      <span class="datetxt mono">25/06/2026  15:24:24</span>
+      <div class="pillbtn"><span class="g24box"><img class="gmoney" src="assets/concept/money.svg" alt=""></span><span class="t">HKD 100/500</span></div>
+      <div class="pillbtn badgebtn"><img class="g24 i" src="assets/concept/mail.svg" alt=""><span class="badge">3</span></div>
+      <div class="pillbtn"><img class="g24 i" src="assets/concept/calc.svg" alt=""></div>
+    </div>
+  </div>
+
+  <!-- ============ ALERT STRIP ============ -->
+  <div id="alerts">
+    <div class="alert-row">
+      <div class="acard" style="width:283px">
+        <div class="top"><div class="lt"><span class="adot" style="background:#e8a34a"></span><span class="ttl">Inventory Low</span></div><span class="time">8:34 PM</span></div>
+        <div class="body">Standard fillSuggest immediate fill</div>
+      </div>
+      <div class="acard" style="width:306px">
+        <div class="top"><div class="lt"><span class="adot" style="background:var(--negative)"></span><span class="ttl">Seat 2-1 hit AML</span></div><span class="time">8:29 PM</span></div>
+        <div class="body">Seats 2-1 Patron hit AML Alert</div>
+      </div>
+      <div class="acard" style="width:306px">
+        <div class="top"><div class="lt"><span class="adot" style="background:var(--negative)"></span><span class="ttl">Update Inventory Now</span></div><span class="time">8:29 PM</span></div>
+        <div class="body">Standard fillSuggest immediate fill</div>
+      </div>
+      <div class="acard" style="width:363px">
+        <div class="top"><div class="lt"><span class="adot" style="background:#4c9cdd"></span><span class="ttl">Seat 2-2 High Value Customer </span></div><span class="time">8:29 PM</span></div>
+        <div class="body">High value customer found, suggest to inform marketing team.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ GRID VIEW (floating) ============ -->
+  <div id="gridview">
+    <img class="g i" src="assets/concept/grid.svg" alt="">
+    <div class="l">Gird View</div>
+  </div>
+
+  <!-- ============ FELT + CENTER INFO ============ -->
+  <div id="felt-wrap">
+    <img id="felt" src="assets/concept/felt.png" alt="">
+    <div id="tinfo">
+      <div class="col">
+        <div class="k">REQ</div>
+        <div class="reqrow"><img class="g i" src="assets/concept/requp.svg" alt=""><span class="reqv">1</span></div>
+      </div>
+      <div class="col">
+        <div class="k">INVENTORY</div>
+        <div class="invv">$126,400</div>
+      </div>
+    </div>
+    <div id="dealer">
+      <div class="col"><div class="id">10001</div><img class="g i" src="assets/concept/dealer1.svg" alt=""><div class="nm">C.Tang</div></div>
+      <div class="col"><div class="id">10002</div><img class="g i" src="assets/concept/dealer2.svg" alt=""><div class="nm">A. Wong</div></div>
+    </div>
+  </div>
+
+  <!-- ============ SEATS GROUP ============ -->
+  <div id="seats">
+    <!-- empty seats: 1-1(0,120) 3-1(224,40) 4-1(336,0) 5-1(448,0) 6-1(560,40) 7-1(672,81) 8-1(784,120) -->
+    <div class="seat" style="left:0;top:120px">
+      <div class="card"></div><div class="add"><img class="g i" src="assets/concept/add.svg" alt=""></div>
+      <div class="lbl"><b>1-1</b></div>
+    </div>
+    <div class="seat" style="left:224px;top:40px">
+      <div class="card"></div><div class="add"><img class="g i" src="assets/concept/add.svg" alt=""></div>
+      <div class="lbl"><b>3-1</b></div>
+    </div>
+    <div class="seat" style="left:336px;top:0">
+      <div class="card"></div><div class="add"><img class="g i" src="assets/concept/add.svg" alt=""></div>
+      <div class="lbl"><b>4-1</b></div>
+    </div>
+    <div class="seat" style="left:448px;top:0">
+      <div class="card"></div><div class="add"><img class="g i" src="assets/concept/add.svg" alt=""></div>
+      <div class="lbl"><b>5-1</b></div>
+    </div>
+    <div class="seat" style="left:560px;top:40px">
+      <div class="card"></div><div class="add"><img class="g i" src="assets/concept/add.svg" alt=""></div>
+      <div class="lbl"><b>6-1</b></div>
+    </div>
+    <div class="seat" style="left:672px;top:81px">
+      <div class="card"></div><div class="add"><img class="g i" src="assets/concept/add.svg" alt=""></div>
+      <div class="lbl"><b>7-1</b></div>
+    </div>
+    <div class="seat" style="left:784px;top:120px">
+      <div class="card"></div><div class="add"><img class="g i" src="assets/concept/add.svg" alt=""></div>
+      <div class="lbl"><b>8-1</b></div>
+    </div>
+
+    <!-- occupied seat 2-1 (left:112 top:11) -->
+    <div class="seat occ" data-seat="2-1" style="left:112px;top:11px">
+      <div class="chip c1"><span class="dm"><img class="g i" src="assets/concept/diamond.svg" alt=""></span><span class="v">P1</span>
+        <img class="reddot i" src="assets/concept/reddot.svg" alt=""></div>
+      <div class="chip c2"><span class="dm"><img class="g i" src="assets/concept/diamond.svg" alt=""></span><span class="v">R1</span></div>
+      <div class="chip c3"><span class="dm"><img class="g i" src="assets/concept/diamond.svg" alt=""></span><span class="v">1</span></div>
+      <div class="big"><b>3</b></div>
+      <div class="lbl"><b>2-1</b></div>
+    </div>
+  </div>
+
+  <!-- ============ BOTTOM ACTION BAR ============ -->
+  <div id="abar">
+    <div class="aitem active">
+      <div class="ico"><img class="g i" src="assets/concept/dropbox.svg" alt=""></div>
+      <div class="l">DROPBOX</div>
+    </div>
+    <div class="arow">
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/headcount.svg" alt=""></div><div class="l">HEADCOUNT</div></div>
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/tranx.svg" alt=""></div><div class="l">TRANSACTIONS</div></div>
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/req.svg" alt=""></div><div class="l">F/C REQ</div></div>
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/chips.svg" alt=""></div><div class="l">BIG CHIPS</div></div>
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/player.svg" alt=""></div><div class="l">PLAYER</div></div>
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/grind.svg" alt=""></div><div class="l">GRIND DROP</div></div>
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/exchange.svg" alt=""></div><div class="l">EXCHANGE</div></div>
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/rating.svg" alt=""></div><div class="l">POST RATINGS</div></div>
+      <div class="aover" id="ov-toggle"><div class="box"><img class="g i" src="assets/concept/chevron.svg" alt=""></div></div>
+    </div>
+  </div>
+
+  <!-- ============ SECOND ACTION ROW (Figma node 2013:24683 — full-width, right-aligned) ============ -->
+  <div id="abar2">
+    <div class="arow2">
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/row2/shift.svg" alt=""></div><div class="l">SHIFT CHANGE</div></div>
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/row2/close.svg" alt=""></div><div class="l">CLOSE TABLE</div></div>
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/row2/fill.svg" alt=""></div><div class="l">FILL</div></div>
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/row2/credit.svg" alt=""></div><div class="l">CREDIT</div></div>
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/row2/transfer.svg" alt=""></div><div class="l">TRANSFER RATINGS</div></div>
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/row2/promo.svg" alt=""></div><div class="l">PROMO CHIPS</div></div>
+      <div class="aitem"><div class="ico"><img class="g i" src="assets/concept/row2/game.svg" alt=""></div><div class="l">GAME CONVERSION</div></div>
+      <div class="aitem" id="settings-btn"><div class="ico"><img class="g i" src="assets/concept/row2/settings.svg" alt=""></div><div class="l">SETTINGS</div></div>
+    </div>
+  </div>
+
+  <!-- ============ CARD RAIL (overlay state: .ui-root.rail-open) — light ============ -->
+  <div id="rail-scrim" data-close-rail></div>
+  <div id="cardrail">
+    <!-- 2-5 empty -->
+    <div class="pcard empty">
+      <span class="chip4">2-5</span>
+      <img class="ph person" src="assets/concept/rail/person_ph.svg" alt="">
+    </div>
+    <!-- 2-4 X.Olat (gold) + EX + AML -->
+    <div class="pcard">
+      <div class="pc-top">
+        <span class="chip4">2-4</span>
+        <span class="namepill gold">X.Olat</span>
+        <span class="alertpill">EX</span>
+        <span class="alertpill">AML</span>
+      </div>
+      <div class="pc-body">
+        <img class="avatar" src="assets/concept/rail/av_xolat.png" alt="">
+        <div class="pc-stats">
+          <div class="rrow"><img class="dm" src="assets/concept/rail/diamond2.svg" alt=""><span>R</span><span>1</span></div>
+          <div class="amt">1000</div>
+          <div class="net">+$2900</div>
+        </div>
+      </div>
+    </div>
+    <!-- 2-3 M.Sally (blue) — tap opens rating detail -->
+    <div class="pcard" data-rate-seat="2-3" role="button" tabindex="0" style="cursor:pointer">
+      <div class="pc-top">
+        <span class="chip4">2-3</span>
+        <span class="namepill blue">M.Sally</span>
+      </div>
+      <div class="pc-body">
+        <img class="avatar" src="assets/concept/rail/av_msally.png" alt="">
+        <div class="pc-stats">
+          <div class="rrow"><img class="dm" src="assets/concept/rail/diamond2.svg" alt=""><span>R</span><span>1</span></div>
+          <div class="amt">1000</div>
+          <div class="net">+$2900</div>
+        </div>
+      </div>
+    </div>
+    <!-- 2-2 C.Tang (dark) -->
+    <div class="pcard">
+      <div class="pc-top">
+        <span class="chip4">2-2</span>
+        <span class="namepill dark">C.Tang</span>
+      </div>
+      <div class="pc-body">
+        <img class="avatar" src="assets/concept/rail/av_ctang.png" alt="">
+        <div class="pc-stats">
+          <div class="rrow"><img class="dm" src="assets/concept/rail/diamond2.svg" alt=""><span>R</span><span>1</span></div>
+          <div class="amt">1000</div>
+          <div class="net">+$2900</div>
+        </div>
+      </div>
+    </div>
+    <!-- 2-1 empty (chair) — selectable → context menu -->
+    <div class="pcard empty sel-seat" data-empty-seat="2-1" role="button" tabindex="0">
+      <img class="ph chair" src="assets/concept/rail/chair_ph.svg" alt="">
+      <span class="chip4 bl">2-1</span>
+    </div>
+  </div>
+
+  <!-- ============ CONTEXT MENU (sub-state: .ui-root.menu-open) — light ============ -->
+  <div id="ctxmenu">
+    <button class="ctx-item">
+      <span class="ctx-ic brass"><img src="assets/concept/rail/ic_search.svg" alt=""></span>
+      <span class="ctx-l">Search</span>
+    </button>
+    <button class="ctx-item">
+      <span class="ctx-ic orange"><img src="assets/concept/rail/ic_walked.svg" alt=""></span>
+      <span class="ctx-l">Walked Patrons</span>
+    </button>
+    <button class="ctx-item">
+      <span class="ctx-ic purple"><img src="assets/concept/rail/ic_create.svg" alt=""></span>
+      <span class="ctx-l">Refused Name</span>
+    </button>
+  </div>
+
+</div>
+<script>
+  (function(){
+    var root=document.querySelector('.ui-root');
+    var ov=document.getElementById('ov-toggle');
+    if(ov){ov.addEventListener('click',function(){root.classList.toggle('ov-open');});}
+    // SETTINGS → switch to the dark table (separate file)
+    var setBtn=document.getElementById('settings-btn');
+    if(setBtn){setBtn.addEventListener('click',function(){ location.href='settings.html?mode=light'; });}
+
+    // ---- CARD RAIL ----
+    var occ=document.querySelector('.seat.occ[data-seat="2-1"]');
+    if(occ){occ.addEventListener('click',function(){root.classList.add('rail-open');});}
+    // tap a patron card in the rail → open the light rating detail
+    document.querySelectorAll('[data-rate-seat]').forEach(function(el){
+      el.addEventListener('click',function(e){ e.stopPropagation(); location.href='concept-rating-light.html'; });
+    });
+    var emptySeat=document.querySelector('[data-empty-seat]');
+    if(emptySeat){emptySeat.addEventListener('click',function(e){
+      e.stopPropagation(); emptySeat.classList.add('selected'); root.classList.add('menu-open');
+    });}
+    function closeAll(){root.classList.remove('rail-open','menu-open'); if(emptySeat)emptySeat.classList.remove('selected');}
+    function closeMenu(){root.classList.remove('menu-open'); if(emptySeat)emptySeat.classList.remove('selected');}
+    document.querySelectorAll('[data-close-rail]').forEach(function(el){
+      el.addEventListener('click',function(){ root.classList.contains('menu-open')?closeMenu():closeAll(); });
+    });
+
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'){
+      if(root.classList.contains('menu-open')){closeMenu();}
+      else if(root.classList.contains('rail-open')){closeAll();}
+      else{root.classList.remove('ov-open');}
+    }});
+  })();
+</script>
+</body>
+</html>

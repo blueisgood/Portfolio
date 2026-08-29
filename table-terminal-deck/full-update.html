@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept TGT · Full Update — MD88012</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Open+Sans:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Concept TGT — Full Update  1024×768
+   Reached by tapping "Full Update" in the inventory summary.
+   Swipe horizontally = next/prev float · swipe vertically = next/prev chipset
+   (touch, mouse-drag, trackpad wheel, and arrow keys all work).
+   "Sync with Angel" reveals Angel values; "Override with Angel"
+   applies them; "Update" writes back to the inventory summary.
+   Rebuilt from Figma 2037:93914 + 2020:132496.
+   ============================================================ */
+:root{
+  --canvas:#0e0b09; --raised:rgba(255,255,255,.05); --card:rgba(14,12,9,.85);
+  --panel:rgba(8,6,5,.94); --glass:rgba(255,255,255,.1);
+  --primary:#f3efe6; --secondary:#a79f92; --muted:#7a736a; --accent:#ebcf8b;
+  --positive:#4bd07a; --negative:#e85a6b; --info:#5aa8e8; --purple:#a66be8; --warning:#e0b64d;
+  --gold:#cea02c; --n09:#fdfdfd;
+  --e1:0 2px 4px rgba(0,0,0,.1); --e2:0 4px 12px rgba(0,0,0,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{width:100vw;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:#000;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:var(--primary)}
+.ui-root{position:relative;width:1024px;height:768px;overflow:hidden;background:var(--canvas)}
+img.i{display:block;width:100%;height:100%}
+
+/* ---------- GLOBAL BAR ---------- */
+#gbar{position:absolute;left:0;top:0;width:1024px;height:64px;background:var(--panel);
+  display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:30}
+.gbar-l{display:flex;align-items:center;gap:12px}
+.iconbtn{background:var(--raised);border:1px solid var(--glass);border-radius:16px;
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--e2)}
+.iconbtn.sq{width:48px;height:48px}.iconbtn.sq .g{width:19px;height:19px}
+.tid{background:var(--raised);border:1px solid var(--glass);border-radius:16px;height:48px;
+  display:flex;align-items:center;gap:4px;padding:0 12px;box-shadow:var(--e1)}
+.tid .dot{width:8px;height:8px;border-radius:50%;background:var(--positive)}
+.tid .nm{font-weight:800;font-size:18px;color:var(--primary)}
+.warnbtn{padding:12px;border-radius:16px;display:flex;align-items:center}.warnbtn .g{width:24px;height:24px}
+.gbar-r{display:flex;align-items:center;gap:12px;justify-content:flex-end}
+.gbar-r .g24box{width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.gbar-r .g16{width:16px;height:16px}
+.pillbtn .gmoney{width:15px;height:15px;object-fit:contain}
+.datetxt{font-weight:600;font-size:16px;color:var(--primary);white-space:nowrap}
+.datetxt.mono{white-space:pre}
+.pillbtn{background:var(--raised);border:1px solid var(--glass);border-radius:16px;
+  display:flex;align-items:center;gap:12px;padding:12px;box-shadow:var(--e2)}
+.pillbtn .g24{width:24px;height:24px}.pillbtn .t{font-weight:700;font-size:16px;color:var(--primary);white-space:nowrap}
+.badgebtn{position:relative}
+.badge{position:absolute;left:26px;top:3px;min-width:18px;height:18px;padding:0 4px;border-radius:43px;
+  background:var(--negative);display:flex;align-items:center;justify-content:center;
+  font-family:'Open Sans';font-weight:700;font-size:12px;line-height:1;color:var(--n09)}
+
+/* ---------- BREADCRUMB ---------- */
+#crumb{position:absolute;left:12px;top:64px;height:29px;display:flex;align-items:center;gap:14px;z-index:5}
+#crumb .s{font-weight:800;font-size:15px;letter-spacing:.5px;color:var(--muted);text-transform:uppercase}
+#crumb .sep{color:var(--muted);font-weight:600}
+#crumb .cur{font-weight:800;font-size:19px;letter-spacing:.5px;color:var(--accent);text-transform:uppercase}
+
+/* ---------- FLOAT TABS (top) — scroll horizontally to view more floats ---------- */
+#floats{position:absolute;left:9px;top:106px;width:1006px;height:66px;z-index:5;
+  display:flex;gap:11px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+#floats::-webkit-scrollbar{height:5px}
+#floats::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:3px}
+#floats::-webkit-scrollbar-track{background:transparent}
+.ftab{flex:none;min-width:165px;height:60px;padding:12px;border-radius:12px;cursor:pointer;
+  background:rgba(255,255,255,.03);border:1px solid var(--glass);display:flex;flex-direction:column;justify-content:space-between}
+.ftab .k{font-weight:700;font-size:12px;letter-spacing:.4px;color:var(--secondary);text-transform:uppercase;white-space:nowrap}
+.ftab .v{font-weight:800;font-size:15px;color:var(--primary);font-variant-numeric:tabular-nums}
+.ftab.sel{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.ftab.sel .k{color:var(--accent)}
+
+/* ---------- CHIPSET RAIL (left) — scroll vertically to view more chipsets ---------- */
+#chips{position:absolute;left:9px;top:181px;width:96px;bottom:80px;z-index:5;
+  display:flex;flex-direction:column;gap:12px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-right:5px}
+#chips::-webkit-scrollbar{width:5px}
+#chips::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:3px}
+#chips::-webkit-scrollbar-track{background:transparent}
+.ctab{flex:none;height:60px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.03);border:1px solid var(--glass);font-weight:800;font-size:20px;letter-spacing:1px;color:var(--primary)}
+.ctab.sel{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);color:var(--accent)}
+/* no focus box on the scroll regions — selection is shown by the highlighted tab itself */
+#floats:focus,#chips:focus,#floats:focus-visible,#chips:focus-visible{outline:none;box-shadow:none}
+
+/* ---------- MAIN TABLE ---------- */
+#tbl{position:absolute;left:110px;top:181px;right:12px;bottom:80px;z-index:4;
+  background:rgba(255,255,255,.02);border:1px solid var(--glass);border-radius:16px;overflow:hidden;
+  display:flex;flex-direction:column;min-height:0}
+.tg{display:grid;align-items:center;padding:0 16px;column-gap:6px;
+  grid-template-columns:1fr 130px 130px;}
+.ui-root.angel #tbl .tg{grid-template-columns:1fr 78px 96px 78px 104px 86px}
+.tg>span,.tg>div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tg .r{text-align:right}
+.t-head{flex:none;height:36px;box-shadow:inset 0 -1px var(--glass)}
+.t-head span{font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;line-height:36px}
+.t-body{flex:1;min-height:0;display:flex;flex-direction:column;padding:8px 8px 8px 0;gap:8px;overflow:hidden}
+/* a denom row (card) */
+.drow{flex:1;min-height:0;margin-left:8px;background:rgba(255,255,255,.035);border:1px solid var(--glass);border-radius:12px;
+  display:flex;align-items:stretch}
+.drow .tg{width:100%;height:100%}
+.drow .denom{display:flex;align-items:center;gap:12px}
+.drow .denom b{font-weight:700;font-size:20px;color:var(--primary)}
+/* CSS poker-chip ring — colour set per denom via --ring */
+.chipico{width:34px;height:34px;border-radius:50%;flex:none;position:relative;
+  background:radial-gradient(circle at 50% 50%, #14100c 0 42%, var(--ring,#e9e6df) 42% 100%)}
+.chipico::before{content:"";position:absolute;inset:3px;border-radius:50%;border:2px dashed rgba(20,16,12,.85)}
+.chipico::after{content:"";position:absolute;inset:11px;border-radius:50%;background:#14100c}
+/* editable value cells */
+.drow .val{font-weight:800;font-size:20px;text-align:right;font-variant-numeric:tabular-nums;color:var(--primary)}
+.drow .val.qty{color:var(--primary)}
+.drow .val.amt{color:var(--secondary)}
+.drow .val.newq{color:var(--primary)}
+.drow .val.newa{color:var(--secondary)}
+.drow .val.var{color:var(--primary)}
+.drow .val.var.neg{color:var(--negative)}
+.drow .val.var.pos{color:var(--positive)}
+/* the editable INV.QTY cell highlights when focused */
+.drow .val.qty[contenteditable]{outline:none;border-radius:6px;padding:0 2px;cursor:text}
+.drow .val.qty[contenteditable]:focus{box-shadow:inset 0 0 0 1.5px var(--accent);background:rgba(235,207,139,.08)}
+/* angel-only columns hidden until synced */
+.acol{display:none}
+.ui-root.angel .acol{display:block}
+
+/* ---------- BOTTOM BAR (Figma 2037:94112 — Back · Sync/Override with Angel · Update) ---------- */
+#fubar{position:absolute;left:0;bottom:0;width:1024px;height:72px;background:var(--panel);z-index:20;
+  display:flex;align-items:center;justify-content:space-between;padding:8px 12px}
+.fu-item{display:flex;align-items:center;gap:8px;padding:4px;cursor:pointer;background:none;border:none}
+.fu-ic{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:var(--e2);flex:none}
+.fu-ic img{width:24px;height:24px;display:block}
+.fu-ic.back{background:#5b5b5d}
+.fu-ic.angel{background:#ac49ee}   /* purple/03 */
+.fu-ic.update{background:#d99d1f}  /* brass/03 */
+.fu-l{font-family:'Open Sans';font-weight:700;font-size:16px;letter-spacing:.15px;color:var(--primary);white-space:nowrap}
+.fu-right{display:flex;gap:12px;align-items:center}
+
+/* subtle flash when values change via override */
+@keyframes flash{0%{background:rgba(166,107,232,.28)}100%{background:transparent}}
+.drow.flash{animation:flash .5s ease}
+
+/* ----- Sync-with-Angel loading indicator ----- */
+@keyframes spin{to{transform:rotate(360deg)}}
+/* the button's check icon swaps to a spinner while syncing */
+#angel-btn.loading .fu-ic img{display:none}
+#angel-btn.loading .fu-ic::after{content:"";width:22px;height:22px;border-radius:50%;
+  border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin .7s linear infinite}
+#angel-btn.loading{opacity:.9}
+/* dim the table + centre a spinner + label while Angel responds */
+#sync-veil{position:absolute;left:110px;top:181px;right:12px;bottom:80px;z-index:10;border-radius:16px;
+  background:rgba(8,6,5,.55);backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.ui-root.syncing #sync-veil{display:flex}
+#sync-veil .ring{width:44px;height:44px;border-radius:50%;border:3px solid rgba(166,107,232,.3);border-top-color:#a66be8;animation:spin .8s linear infinite}
+#sync-veil .msg{font-weight:800;font-size:14px;letter-spacing:.4px;color:var(--primary)}
+#sync-veil .sub{font-weight:500;font-size:12px;color:var(--secondary);margin-top:-8px}
+
+/* card-swap animation on swipe — the table slides + fades in from the swipe direction */
+@keyframes cardInL{0%{opacity:0;transform:translateX(46px)}100%{opacity:1;transform:translateX(0)}}
+@keyframes cardInR{0%{opacity:0;transform:translateX(-46px)}100%{opacity:1;transform:translateX(0)}}
+@keyframes cardInU{0%{opacity:0;transform:translateY(40px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes cardInD{0%{opacity:0;transform:translateY(-40px)}100%{opacity:1;transform:translateY(0)}}
+#tbl.swap-l{animation:cardInL .32s cubic-bezier(.22,1,.36,1)}
+#tbl.swap-r{animation:cardInR .32s cubic-bezier(.22,1,.36,1)}
+#tbl.swap-u{animation:cardInU .32s cubic-bezier(.22,1,.36,1)}
+#tbl.swap-d{animation:cardInD .32s cubic-bezier(.22,1,.36,1)}
+/* the tab that becomes selected gives a quick pop */
+@keyframes tabpop{0%{transform:scale(1)}45%{transform:scale(1.045)}100%{transform:scale(1)}}
+.ftab.sel.pop,.ctab.sel.pop{animation:tabpop .28s ease}
+/* rows stagger in slightly for a lively feel */
+@keyframes rowIn{0%{opacity:.25}100%{opacity:1}}
+#tbl.swapping .drow{animation:rowIn .34s ease both}
+#tbl.swapping .drow:nth-child(1){animation-delay:.02s}
+#tbl.swapping .drow:nth-child(2){animation-delay:.05s}
+#tbl.swapping .drow:nth-child(3){animation-delay:.08s}
+#tbl.swapping .drow:nth-child(4){animation-delay:.11s}
+#tbl.swapping .drow:nth-child(5){animation-delay:.14s}
+#tbl.swapping .drow:nth-child(6){animation-delay:.17s}
+</style>
+</head>
+<body>
+<div class="ui-root">
+
+  <!-- ============ GLOBAL BAR ============ -->
+  <div id="gbar">
+    <div class="gbar-l">
+      <div class="iconbtn sq"><img class="g i" src="assets/concept-dark/menu.svg" alt=""></div>
+      <div class="tid"><span class="dot"></span><span class="nm">MD88012</span></div>
+      <div class="warnbtn"><img class="g i" src="assets/concept-dark/warn.svg" alt=""></div>
+    </div>
+    <div class="gbar-r">
+      <span class="g24box"><img class="g16 i" src="assets/concept-dark/card.svg" alt=""></span>
+      <span class="datetxt">25/06/2026</span>
+      <span class="g24box"><img class="g16 i" src="assets/concept-dark/calendar.svg" alt=""></span>
+      <span class="datetxt mono">25/06/2026  15:24:24</span>
+      <div class="pillbtn"><span class="g24box"><img class="gmoney" src="assets/concept-dark/money.svg" alt=""></span><span class="t">HKD 100/500</span></div>
+      <div class="pillbtn badgebtn"><img class="g24 i" src="assets/concept-dark/mail.svg" alt=""><span class="badge">3</span></div>
+      <div class="pillbtn"><img class="g24 i" src="assets/concept-dark/calc.svg" alt=""></div>
+    </div>
+  </div>
+
+  <!-- ============ BREADCRUMB ============ -->
+  <div id="crumb">
+    <span class="s">Full Update</span><span class="sep">/</span>
+    <span class="s" id="cr-float">Top Rack</span><span class="sep">/</span>
+    <span class="cur" id="cr-chip">VHK</span>
+  </div>
+
+  <!-- ============ FLOAT TABS (scroll horizontally to view more floats) ============ -->
+  <div id="floats"></div>
+
+  <!-- ============ CHIPSET RAIL (scroll vertically to view more chipsets) ============ -->
+  <div id="chips"></div>
+
+  <!-- ============ MAIN TABLE ============ -->
+  <div id="tbl">
+    <div class="tg t-head">
+      <span>DENOM</span>
+      <span class="r">INV. QTY</span>
+      <span class="r">INV. AMT</span>
+      <span class="r acol">NEW QTY</span>
+      <span class="r acol">NEW AMT</span>
+      <span class="r acol">VARIANCE</span>
+    </div>
+    <div class="t-body" id="t-body"></div>
+  </div>
+
+  <!-- sync-with-Angel loading overlay -->
+  <div id="sync-veil"><div class="ring"></div><div class="msg">Syncing with Angel…</div><div class="sub">Fetching declared counts</div></div>
+
+  <!-- ============ BOTTOM BAR ============ -->
+  <div id="fubar">
+    <button class="fu-item" data-back><span class="fu-ic back"><img src="assets/concept-dark/inventory/ic_back.svg" alt=""></span><span class="fu-l">Back</span></button>
+    <div class="fu-right">
+      <button class="fu-item" id="angel-btn"><span class="fu-ic angel"><img src="assets/concept-dark/inventory/ic_check2.svg" alt=""></span><span class="fu-l" id="angel-l">Sync with Angel</span></button>
+      <button class="fu-item" id="update-btn"><span class="fu-ic update"><img src="assets/concept-dark/inventory/ic_check2.svg" alt=""></span><span class="fu-l">Update</span></button>
+    </div>
+  </div>
+
+</div>
+<script>
+  (function(){
+    var root=document.querySelector('.ui-root');
+    var FLOATS=[
+      {k:'Top Rack',v:'50,000'},{k:'Sunken Rack',v:'50,000'},
+      {k:'Cabinet Top Drawer',v:'5,000'},{k:'Cabinet Bottom Drawer',v:'5,000'},
+      {k:'External Float',v:'160,000'}
+    ];
+    var CHIPSETS=['VHK','FSK','VSM','IUJ','XDS'];
+    // denom + its chip ring colour (per Figma: white / purple / gold …)
+    var DENOMS=[
+      {v:'10,000',n:10000,ring:'#e9e6df'},
+      {v:'5,000', n:5000, ring:'#a66be8'},
+      {v:'1,000', n:1000, ring:'#e0b64d'},
+      {v:'500',   n:500,  ring:'#e9e6df'},
+      {v:'100',   n:100,  ring:'#e9e6df'},
+      {v:'50',    n:50,   ring:'#e9e6df'}
+    ];
+    var DENVALS=DENOMS.map(function(d){return d.n;});
+
+    // ---- per-cell data: each (float, chipset) holds its own INV quantities + Angel counts ----
+    // Deterministic seed so every rack×chipset shows distinct, stable numbers (no Math.random).
+    function seedQty(f,c,den){ var i=DENVALS.indexOf(den);
+      var base=[[2,4,1,6,10,20],[0,2,3,8,12,24],[1,0,2,5,9,18],[0,0,4,7,11,22],[3,1,0,4,8,16]][i%5];
+      var v=base[(f*3+c*2+i)%6]; return v*((f+c)%3===0?2:1); }
+    function seedAngel(f,c,den){ var q=seedQty(f,c,den);
+      // Angel occasionally differs from the counted INV → creates a variance
+      var i=DENVALS.indexOf(den); return ((f+c+i)%4===0)? q+ ((i%2)?2:1)*10 : q; }
+    var DATA={};   // key "f|c" → {den:qty}
+    var ANGELD={}; // key "f|c" → {den:angelQty}
+    for(var f=0;f<FLOATS.length;f++){ for(var c=0;c<CHIPSETS.length;c++){
+      var k=f+'|'+c, m={}, a={};
+      DENVALS.forEach(function(den){ m[den]=seedQty(f,c,den); a[den]=seedAngel(f,c,den); });
+      DATA[k]=m; ANGELD[k]=a;
+    }}
+
+    var fi=0, ci=0;                 // selected float / chipset index
+    function KEY(){ return fi+'|'+ci; }
+    function QTY(){ return DATA[KEY()]; }        // live INV quantities for the current cell
+    function ANGEL(){ return ANGELD[KEY()]; }    // Angel counts for the current cell
+
+    function fmt(n){ return n.toLocaleString('en-US'); }
+
+    // ---- build the float tabs + chipset rail ----
+    document.getElementById('floats').innerHTML=FLOATS.map(function(f,i){
+      return '<div class="ftab'+(i===0?' sel':'')+'" data-fi="'+i+'"><div class="k">'+f.k+'</div><div class="v">'+f.v+'</div></div>';
+    }).join('');
+    document.getElementById('chips').innerHTML=CHIPSETS.map(function(c,i){
+      return '<div class="ctab'+(i===0?' sel':'')+'" data-ci="'+i+'">'+c+'</div>';
+    }).join('');
+
+    // ---- render the denom rows ----
+    function render(){
+      var q0=QTY(), a0=ANGEL();
+      var body=DENOMS.map(function(d){
+        var q=q0[d.n]||0, amt=q*d.n;
+        var nq=root.classList.contains('angel')?a0[d.n]:null;
+        var na=nq!=null?nq*d.n:null;
+        var vq=nq!=null?(q-nq):null;   // variance = current INV − Angel NEW
+        var varCls=vq==null?'':(vq<0?'neg':(vq>0?'pos':''));
+        return '<div class="drow" data-den="'+d.n+'"><div class="tg">'
+          +'<span class="denom"><span class="chipico" style="--ring:'+d.ring+'"></span><b>'+d.v+'</b></span>'
+          +'<span class="val qty r" contenteditable="true" data-qty>'+q+'</span>'
+          +'<span class="val amt r">'+fmt(amt)+'</span>'
+          +'<span class="val newq r acol">'+(nq!=null?nq:'')+'</span>'
+          +'<span class="val newa r acol">'+(na!=null?fmt(na):'')+'</span>'
+          +'<span class="val var r acol '+varCls+'">'+(vq!=null?(vq>0?'+':'')+vq:'')+'</span>'
+          +'</div></div>';
+      }).join('');
+      document.getElementById('t-body').innerHTML=body;
+      wireQty();
+    }
+    // ---- editable INV.QTY cells ----
+    function wireQty(){
+      document.querySelectorAll('[data-qty]').forEach(function(el){
+        var den=+el.closest('.drow').getAttribute('data-den');
+        el.addEventListener('input',function(){
+          var n=parseInt(el.textContent.replace(/[^0-9]/g,''))||0; QTY()[den]=n;
+          // live-update the amount + variance without losing caret
+          var row=el.closest('.drow');
+          row.querySelector('.amt').textContent=fmt(n*den);
+          if(root.classList.contains('angel')){
+            var vq=n-(ANGEL()[den]||0), vc=row.querySelector('.var');
+            vc.textContent=(vq>0?'+':'')+vq; vc.className='val var r acol '+(vq<0?'neg':(vq>0?'pos':''));
+          }
+        });
+        el.addEventListener('focus',function(){ if(el.textContent.trim()==='0') el.textContent=''; });
+        el.addEventListener('blur',function(){ if(el.textContent.trim()==='') el.textContent='0'; });
+      });
+    }
+
+    // ---- card-swap animation on selection change ----
+    var tblEl2=document.getElementById('tbl');
+    function playSwap(dir){   // dir: 'l' 'r' 'u' 'd'
+      tblEl2.classList.remove('swap-l','swap-r','swap-u','swap-d','swapping');
+      void tblEl2.offsetWidth;                       // force reflow so the animation restarts
+      tblEl2.classList.add('swap-'+dir,'swapping');
+      setTimeout(function(){ tblEl2.classList.remove('swap-'+dir,'swapping'); },360);
+    }
+    function popTab(el){ if(!el)return; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+      setTimeout(function(){el.classList.remove('pop');},300); }
+
+    // ---- float / chipset selection ----
+    function selFloat(i){ var ni=(i+FLOATS.length)%FLOATS.length; if(ni===fi)return; var dir=(ni>fi||(fi===FLOATS.length-1&&ni===0))?'l':'r'; fi=ni;
+      document.querySelectorAll('.ftab').forEach(function(t,k){t.classList.toggle('sel',k===fi);});
+      document.getElementById('cr-float').textContent=FLOATS[fi].k;
+      var sel=document.querySelector('.ftab.sel'); sel.scrollIntoView({inline:'nearest',block:'nearest',behavior:'smooth'});
+      render(); playSwap(dir); popTab(sel);   // show this rack×chipset's own numbers
+    }
+    function selChip(i){ var ni=(i+CHIPSETS.length)%CHIPSETS.length; if(ni===ci)return; var dir=(ni>ci||(ci===CHIPSETS.length-1&&ni===0))?'u':'d'; ci=ni;
+      document.querySelectorAll('.ctab').forEach(function(t,k){t.classList.toggle('sel',k===ci);});
+      document.getElementById('cr-chip').textContent=CHIPSETS[ci];
+      var sel=document.querySelector('.ctab.sel'); sel.scrollIntoView({block:'nearest',behavior:'smooth'});
+      render(); playSwap(dir); popTab(sel);
+    }
+    document.getElementById('floats').addEventListener('click',function(e){
+      var t=e.target.closest('[data-fi]'); if(t) selFloat(+t.getAttribute('data-fi'));
+    });
+    document.getElementById('chips').addEventListener('click',function(e){
+      var t=e.target.closest('[data-ci]'); if(t) selChip(+t.getAttribute('data-ci'));
+    });
+
+    // keyboard: ←/→ float · ↑/↓ chipset · Esc back.
+    // Works globally; also drives whichever scroll region has focus.
+    document.addEventListener('keydown',function(e){
+      var ae=document.activeElement;
+      if(ae && ae.hasAttribute && ae.hasAttribute('data-qty')) return;   // don't hijack while editing a qty
+      if(e.key==='ArrowRight'){ e.preventDefault(); selFloat(fi+1); }
+      else if(e.key==='ArrowLeft'){ e.preventDefault(); selFloat(fi-1); }
+      else if(e.key==='ArrowDown'){ e.preventDefault(); selChip(ci+1); }
+      else if(e.key==='ArrowUp'){ e.preventDefault(); selChip(ci-1); }
+      else if(e.key==='Escape'){ location.href='inventory-summary.html'; }
+    });
+    // ===== SWIPE: horizontal → next/prev float · vertical → next/prev chipset =====
+    // Applies to the whole content area; skips gestures that start on an editable qty cell.
+    var area=document.querySelector('.ui-root');
+    function startOK(t){ return !t.closest('[data-qty]'); }
+
+    // -- touch (real swipe on touchscreens) --
+    var tx=0, ty=0, tsw=false;
+    area.addEventListener('touchstart',function(e){ if(!startOK(e.target))return; var t=e.touches[0]; tx=t.clientX; ty=t.clientY; tsw=true; },{passive:true});
+    area.addEventListener('touchend',function(e){
+      if(!tsw)return; tsw=false; var t=e.changedTouches[0], dx=t.clientX-tx, dy=t.clientY-ty;
+      if(Math.abs(dx)<40 && Math.abs(dy)<40) return;                 // ignore taps
+      if(Math.abs(dx)>=Math.abs(dy)){ selFloat(fi+(dx<0?1:-1)); }    // horizontal → float
+      else { selChip(ci+(dy<0?1:-1)); }                             // vertical → chipset
+    },{passive:true});
+
+    // -- mouse drag (desktop swipe) --
+    var mx=0, my=0, mdrag=false;
+    area.addEventListener('mousedown',function(e){ if(!startOK(e.target))return; mdrag=true; mx=e.clientX; my=e.clientY; });
+    window.addEventListener('mouseup',function(e){
+      if(!mdrag)return; mdrag=false; var dx=e.clientX-mx, dy=e.clientY-my;
+      if(Math.abs(dx)<60 && Math.abs(dy)<50) return;                 // ignore clicks
+      if(Math.abs(dx)>=Math.abs(dy)){ selFloat(fi+(dx<0?1:-1)); }
+      else { selChip(ci+(dy<0?1:-1)); }
+    });
+
+    // -- trackpad / wheel swipe (debounced so one gesture = one step) --
+    var wheelLock=false;
+    area.addEventListener('wheel',function(e){
+      if(e.target.closest('[data-qty]')) return;
+      var adx=Math.abs(e.deltaX), ady=Math.abs(e.deltaY);
+      if(Math.max(adx,ady)<12) return;
+      e.preventDefault();
+      if(wheelLock) return; wheelLock=true; setTimeout(function(){wheelLock=false;},420);
+      if(adx>=ady){ selFloat(fi+(e.deltaX>0?1:-1)); }               // horizontal → float
+      else { selChip(ci+(e.deltaY>0?1:-1)); }                       // vertical → chipset
+    },{passive:false});
+
+
+    // ---- Sync / Override with Angel ----
+    var angelBtn=document.getElementById('angel-btn'), angelL=document.getElementById('angel-l'),
+        angelIc=angelBtn.querySelector('.fu-ic');
+    var syncing=false;
+    angelBtn.addEventListener('click',function(){
+      if(syncing) return;
+      if(!root.classList.contains('angel')){
+        // first tap → sync: Angel takes a moment to respond → show a loading indicator
+        syncing=true;
+        angelBtn.classList.add('loading'); angelIc.classList.add('spin');
+        angelL.textContent='Syncing with Angel…';
+        root.classList.add('syncing');                 // shows the table overlay spinner
+        setTimeout(function(){
+          syncing=false;
+          angelBtn.classList.remove('loading'); angelIc.classList.remove('spin');
+          root.classList.remove('syncing');
+          root.classList.add('angel'); angelL.textContent='Override with Angel';
+          render();
+        }, 1600);
+      } else {
+        // second tap → override the current cell's INV quantities with the Angel NEW values
+        var q=QTY(), a=ANGEL(); DENVALS.forEach(function(den){ q[den]=a[den]||0; });
+        render();
+        document.querySelectorAll('.drow').forEach(function(r){ r.classList.add('flash');
+          setTimeout(function(){r.classList.remove('flash');},500); });
+      }
+    });
+
+    // ---- Update → write ALL edited cells to the inventory summary + return ----
+    document.getElementById('update-btn').addEventListener('click',function(){
+      try{
+        var cells={};
+        for(var f=0;f<FLOATS.length;f++)for(var c=0;c<CHIPSETS.length;c++){cells[FLOATS[f].k+' · '+CHIPSETS[c]]=DATA[f+'|'+c];}
+        sessionStorage.setItem('tgt-inv-update', JSON.stringify({cells:cells, ts:'25/06/2026 15:24'}));
+      }catch(e){}
+      location.href='concept-table-dark.html?updated=1';
+    });
+
+    // ---- back ----
+    document.querySelectorAll('[data-back]').forEach(function(el){
+      el.addEventListener('click',function(){ location.href='inventory-summary.html'; });
+    });
+
+    render();
+  })();
+</script>
+</body>
+</html>

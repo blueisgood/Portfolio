@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="chip">
+<circle id="Ellipse" cx="12" cy="12" r="12" fill="#EBCF8B"/>
+<circle id="Ellipse_2" cx="12" cy="12" r="6.6" fill="#080605" fill-opacity="0.94"/>
+<circle id="Ellipse_3" cx="12" cy="12" r="3.36" fill="#EBCF8B"/>
+<rect id="Rectangle" x="11" y="1" width="2.64" height="3.36" rx="0.96" fill="#080605" fill-opacity="0.94"/>
+<rect id="Rectangle_2" x="20.9098" y="6" width="2.64" height="3.36" rx="0.96" transform="rotate(60 20.9098 6)" fill="#080605" fill-opacity="0.94"/>
+<rect id="Rectangle_3" x="21.2298" y="17.68" width="2.64" height="3.36" rx="0.96" transform="rotate(120 21.2298 17.68)" fill="#080605" fill-opacity="0.94"/>
+<rect id="Rectangle_4" x="13.64" y="23.36" width="2.64" height="3.36" rx="0.96" transform="rotate(180 13.64 23.36)" fill="#080605" fill-opacity="0.94"/>
+<rect id="Rectangle_5" x="4.32" y="19.9663" width="2.64" height="3.36" rx="0.96" transform="rotate(-120 4.32 19.9663)" fill="#080605" fill-opacity="0.94"/>
+<rect id="Rectangle_6" x="2" y="8.28631" width="2.64" height="3.36" rx="0.96" transform="rotate(-60 2 8.28631)" fill="#080605" fill-opacity="0.94"/>
+</g>
+</svg>
